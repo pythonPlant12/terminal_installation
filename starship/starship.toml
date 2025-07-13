@@ -1,0 +1,88 @@
+# Starship Configuration
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Move time to the right side of terminal
+right_format = '$time'
+
+# Character
+[character]
+success_symbol = '[➜](bold green)'
+error_symbol = '[➜](bold red)'
+
+# Disable AWS module to hide eu-west-3
+[aws]
+disabled = true
+
+# Directory
+[directory]
+style = "bold cyan"
+truncation_length = 3
+truncate_to_repo = false
+
+# Git Branch
+[git_branch]
+symbol = "🌱 "
+style = "bold purple"
+
+# Git Status
+[git_status]
+style = "bold yellow"
+
+# Programming Languages with versions
+[nodejs]
+symbol = "⬢ "
+style = "bold green"
+format = "via [$symbol($version )]($style)"
+
+[rust]
+symbol = "🦀 "
+style = "bold red"
+format = "via [$symbol($version )]($style)"
+
+[python]
+symbol = "🐍 "
+style = "bold yellow"
+format = "via [$symbol$pyname $version]($style) "
+
+[golang]
+symbol = "🐹 "
+style = "bold cyan"
+format = "via [$symbol($version )]($style)"
+
+[java]
+symbol = "☕ "
+style = "bold red"
+format = "via [$symbol($version )]($style)"
+
+[php]
+symbol = "🐘 "
+style = "bold purple"
+format = "via [$symbol($version )]($style)"
+
+[dart]
+symbol = "🎯 "
+style = "bold blue"
+format = "via [$symbol($version )]($style)"
+
+[docker_context]
+symbol = "🐳 "
+style = "bold blue"
+format = "via [$symbol$context]($style) "
+
+# Package version
+[package]
+symbol = "📦 "
+style = "bold yellow"
+format = "is [$symbol$version]($style) "
+
+# Time (right-aligned)
+[time]
+disabled = false
+format = '🕙[$time]($style)'
+time_format = "%H:%M:%S"
+style = "bold white"
+
+# Add line break for readability
+[line_break]
+disabled = false
