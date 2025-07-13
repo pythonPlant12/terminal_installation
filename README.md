@@ -25,13 +25,15 @@ Ensure you have these installed:
 ### One-Command Setup
 
 ```bash
-# Clone this repository
-git clone <this-repo-url> ~/terminal-setup
-cd ~/terminal-setup
+# Navigate to the terminal installation directory
+cd ~/programming/terminal_installation
 
-# Run the installation script
-chmod +x install.sh
+# Run the universal installation script (auto-detects OS)
 ./install.sh
+
+# Or run OS-specific scripts directly:
+./install-macos.sh    # For macOS
+./install-ubuntu.sh   # For Ubuntu/Debian
 ```
 
 ### Manual Installation
@@ -121,7 +123,9 @@ source ~/.zshrc
 ```
 terminal_installation/
 ├── README.md                 # This file
-├── install.sh               # Automated installation script
+├── install.sh               # Universal installation script (auto-detects OS)
+├── install-macos.sh         # macOS installation script
+├── install-ubuntu.sh        # Ubuntu/Debian installation script
 ├── oh-my-zsh/
 │   ├── .zshrc               # Zsh configuration
 │   └── README.md            # Oh My Zsh installation guide
