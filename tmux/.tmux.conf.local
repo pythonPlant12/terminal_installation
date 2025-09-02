@@ -85,24 +85,24 @@ tmux_conf_24b_colour=auto
 #   - tmux_conf_theme_synchronized
 tmux_conf_theme=enabled
 
-# JetBrains theme (matching nvim jb colorscheme)
-tmux_conf_theme_colour_1="#2B2D30"    # main background
-tmux_conf_theme_colour_2="#43454A"    # border/inactive
-tmux_conf_theme_colour_3="#9A9CA4"    # secondary text
-tmux_conf_theme_colour_4="#56A8F5"    # primary blue (active)
-tmux_conf_theme_colour_5="#EEBA6C"    # yellow/warning
-tmux_conf_theme_colour_6="#1E1F21"    # darker background
-tmux_conf_theme_colour_7="#BCBEC4"    # main text
-tmux_conf_theme_colour_8="#2B2D30"    # main background
-tmux_conf_theme_colour_9="#CF8E6D"    # orange/accent
-tmux_conf_theme_colour_10="#C77DBB"   # purple/constant
-tmux_conf_theme_colour_11="#6AAB73"   # green/string
-tmux_conf_theme_colour_12="#707379"   # dimmed text
-tmux_conf_theme_colour_13="#BCBEC4"   # main text
-tmux_conf_theme_colour_14="#393B40"   # popup background
-tmux_conf_theme_colour_15="#2B2D30"   # status background
-tmux_conf_theme_colour_16="#F75464"   # red/error
-tmux_conf_theme_colour_17="#BCBEC4"   # main text
+# rosé pine moon theme
+tmux_conf_theme_colour_1="#232136"    # base (background)
+tmux_conf_theme_colour_2="#393552"    # overlay
+tmux_conf_theme_colour_3="#6e6a86"    # muted
+tmux_conf_theme_colour_4="#3e8fb0"    # pine (teal)
+tmux_conf_theme_colour_5="#f6c177"    # gold
+tmux_conf_theme_colour_6="#232136"    # base
+tmux_conf_theme_colour_7="#e0def4"    # text
+tmux_conf_theme_colour_8="#232136"    # base
+tmux_conf_theme_colour_9="#f6c177"    # gold
+tmux_conf_theme_colour_10="#eb6f92"   # love (pink)
+tmux_conf_theme_colour_11="#9ccfd8"   # foam (light cyan)
+tmux_conf_theme_colour_12="#908caa"   # subtle
+tmux_conf_theme_colour_13="#e0def4"   # text
+tmux_conf_theme_colour_14="#232136"   # base
+tmux_conf_theme_colour_15="#2a273f"   # surface
+tmux_conf_theme_colour_16="#eb6f92"   # love (red/pink)
+tmux_conf_theme_colour_17="#e0def4"   # text
 
 # default theme (ansi)
 #tmux_conf_theme_colour_1="colour0"
@@ -370,7 +370,7 @@ tmux_conf_theme_clock_style="24"
 #   - false (default)
 #   - disabled
 # on Linux, this requires xsel, xclip or wl-copy
-tmux_conf_copy_to_os_clipboard=false
+tmux_conf_copy_to_os_clipboard=true
 
 
 # -- urlscan -------------------------------------------------------------------
@@ -416,18 +416,24 @@ bind -r J resize-pane -U 5  #!important
 bind -r K resize-pane -D 5  #!important
 bind -r L resize-pane -R 5  #!important
 
-# vim-style copy mode bindings
+# vim-style copy mode bindings - always preserve selection and copy to system clipboard
 bind-key -T copy-mode-vi 'v' send-keys -X begin-selection  #!important
-bind-key -T copy-mode-vi 'y' send-keys -X copy-selection  #!important
+bind-key -T copy-mode-vi 'y' send-keys -X copy-pipe-no-clear 'xclip -in -selection clipboard'  #!important
+bind-key -T copy-mode-vi 'Y' send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'  #!important
 bind-key -T copy-mode-vi 'r' send-keys -X rectangle-toggle  #!important
 
-# fix mouse selection - make it persist after releasing mouse
-bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-selection-no-clear  #!important
-bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-selection-no-clear  #!important
+# fix mouse selection - make it persist after releasing mouse and copy to system clipboard
+bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-no-clear 'xclip -in -selection clipboard'  #!important
+bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-no-clear 'xclip -in -selection clipboard'  #!important
+
+# Enter key copies to system clipboard and exits selection mode
+bind-key -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'  #!important
 
 # enable automatic path tracking
 set -g automatic-rename on  #!important
 set -g automatic-rename-format "#{?#{==:#{pane_current_command},zsh},#{b:pane_current_path},#{pane_current_command}}"  #!important
+set -g set-clipboard on
+set -s set-clipboard external
 
 # move status line to top
 #set -g status-position top
