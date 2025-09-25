@@ -133,3 +133,6 @@ zstyle ':autocomplete:*' widget-style menu-select
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# Source Kubernetes and Docker aliases
+source $ZSH_CUSTOM/k8s-docker-aliases.zsh 2>/dev/null || true

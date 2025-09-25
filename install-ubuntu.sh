@@ -512,6 +512,9 @@ main() {
     echo "- tree, htop, neofetch, ripgrep, fd-find, bat, exa (if available)"
     echo "- lazygit (Git TUI)"
     echo "- serpl & ast-grep (terminal search & replace with AST support - requires Rust)"
+    echo ""
+    echo "Optional tools:"
+    echo "- Run ./install-k8s-docker-tools.sh for Kubernetes & Docker tools (k9s, kubectx, helm, etc.)"
 }
 
 # Run main function

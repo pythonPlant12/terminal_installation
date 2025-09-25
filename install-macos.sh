@@ -385,6 +385,9 @@ main() {
     echo ""
     echo "Additional tools installed:"
     echo "- serpl & ast-grep (terminal search & replace with AST support - requires Rust)"
+    echo ""
+    echo "Optional tools:"
+    echo "- Run ./install-k8s-docker-tools.sh for Kubernetes & Docker tools (k9s, kubectx, helm, etc.)"
 }
 
 # Run main function
