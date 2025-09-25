@@ -54,7 +54,14 @@ check_prerequisites() {
     
     # Update package list
     print_info "Updating package list..."
-    sudo apt update
+    if ! sudo apt update 2>/dev/null; then
+        print_warning "Package update failed. Trying to fix repository issues..."
+        # Remove problematic lazygit PPA if it exists
+        if sudo add-apt-repository --remove ppa:lazygit-team/release -y 2>/dev/null; then
+            print_info "Removed problematic lazygit PPA repository"
+        fi
+        sudo apt update
+    fi
     
     # Install required packages
     required_packages=(
@@ -317,6 +324,68 @@ install_additional_packages() {
     print_success "Additional packages installed"
 }
 
+# Install lazygit
+install_lazygit() {
+    print_step "Installing lazygit..."
+    
+    if command -v lazygit &> /dev/null; then
+        print_success "lazygit already installed"
+        return
+    fi
+    
+    # Try installing via snap first (most reliable)
+    if command -v snap &> /dev/null; then
+        print_info "Installing lazygit via snap..."
+        if sudo snap install lazygit 2>/dev/null; then
+            print_success "lazygit installed via snap"
+            return
+        fi
+    fi
+    
+    # Try downloading latest release from GitHub
+    print_info "Installing lazygit from GitHub releases..."
+    LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+    if [[ -n "$LAZYGIT_VERSION" ]]; then
+        curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+        if [[ -f "lazygit.tar.gz" ]]; then
+            tar xf lazygit.tar.gz lazygit
+            sudo install lazygit /usr/local/bin
+            rm lazygit lazygit.tar.gz
+            print_success "lazygit installed from GitHub"
+        else
+            print_warning "Could not install lazygit automatically. Install manually if needed."
+        fi
+    else
+        print_warning "Could not determine latest lazygit version"
+    fi
+}
+
+# Install serpl (terminal search and replace tool)
+install_serpl() {
+    print_step "Installing serpl..."
+    
+    if command -v serpl &> /dev/null; then
+        print_success "serpl already installed"
+        return
+    fi
+    
+    # Check if Rust/Cargo is installed
+    if ! command -v cargo &> /dev/null; then
+        print_error "Rust and Cargo are required but not installed."
+        print_info "Please install Rust first: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+        return 1
+    fi
+    
+    print_info "Installing serpl with AST Grep support..."
+    cargo install serpl --features ast_grep
+    
+    # Install ast-grep separately (required dependency)
+    print_info "Installing ast-grep..."
+    cargo install ast-grep
+    
+    print_success "serpl installed with AST Grep support"
+}
+
 # Final verification
 verify_installation() {
     print_step "Verifying installation..."
@@ -381,6 +450,27 @@ verify_installation() {
     else
         print_warning "FiraCode Nerd Font: Not found (install manually if needed)"
     fi
+    
+    # Check lazygit
+    if command -v lazygit &> /dev/null; then
+        print_success "lazygit: Installed ($(lazygit --version | head -1))"
+    else
+        print_warning "lazygit: Not found (install manually if needed)"
+    fi
+    
+    # Check serpl
+    if command -v serpl &> /dev/null; then
+        print_success "serpl: Installed ($(serpl --version))"
+    else
+        print_warning "serpl: Not found (requires Rust/Cargo)"
+    fi
+    
+    # Check ast-grep
+    if command -v ast-grep &> /dev/null; then
+        print_success "ast-grep: Installed ($(ast-grep --version | head -1))"
+    else
+        print_warning "ast-grep: Not found (part of serpl installation)"
+    fi
 }
 
 # Main installation function
@@ -397,6 +487,8 @@ main() {
     install_tmux
     install_nerd_font
     install_additional_packages
+    install_lazygit
+    install_serpl
     copy_configurations
     set_default_shell
     verify_installation
@@ -418,6 +510,8 @@ main() {
     echo ""
     echo "Additional tools installed:"
     echo "- tree, htop, neofetch, ripgrep, fd-find, bat, exa (if available)"
+    echo "- lazygit (Git TUI)"
+    echo "- serpl & ast-grep (terminal search & replace with AST support - requires Rust)"
 }
 
 # Run main function

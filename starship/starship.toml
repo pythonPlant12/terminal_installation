@@ -14,6 +14,10 @@ error_symbol = '[➜](bold red)'
 [aws]
 disabled = true
 
+# Disable GCloud module
+[gcloud]
+disabled = true
+
 # Directory
 [directory]
 style = "bold cyan"
@@ -42,8 +46,9 @@ format = "via [$symbol($version )]($style)"
 
 [python]
 symbol = "🐍 "
+pyenv_version_name = true
 style = "bold yellow"
-format = "via [$symbol$pyname $version]($style) "
+format = "via [$symbol $virtualenv $version]($style) "
 
 [golang]
 symbol = "🐹 "
@@ -69,6 +74,16 @@ format = "via [$symbol($version )]($style)"
 symbol = "🐳 "
 style = "bold blue"
 format = "via [$symbol$context]($style) "
+
+[kubernetes]
+symbol = "⎈ "
+format = 'on [$symbol$context( \($namespace\))](bold blue) '
+style = "bold blue"
+disabled = false
+detect_extensions = []
+detect_files = ['k8s', 'kube']
+detect_folders = ['.kube']
+detect_env_vars = ['KUBECONFIG', 'KUBECTL_CONTEXT']
 
 # Package version
 [package]

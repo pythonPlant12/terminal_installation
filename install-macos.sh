@@ -252,6 +252,33 @@ set_default_shell() {
     fi
 }
 
+# Install serpl (terminal search and replace tool)
+install_serpl() {
+    print_step "Installing serpl..."
+    
+    if command -v serpl &> /dev/null; then
+        print_success "serpl already installed"
+        return
+    fi
+    
+    # Check if Rust/Cargo is installed
+    if ! command -v cargo &> /dev/null; then
+        print_error "Rust and Cargo are required but not installed."
+        print_info "Please install Rust first: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+        print_info "Or install via Homebrew: brew install rust"
+        return 1
+    fi
+    
+    print_info "Installing serpl with AST Grep support..."
+    cargo install serpl --features ast_grep
+    
+    # Install ast-grep separately (required dependency)
+    print_info "Installing ast-grep..."
+    cargo install ast-grep
+    
+    print_success "serpl installed with AST Grep support"
+}
+
 # Final verification
 verify_installation() {
     print_step "Verifying installation..."
@@ -309,6 +336,20 @@ verify_installation() {
     else
         print_warning "Tmux config: Not found (optional)"
     fi
+    
+    # Check serpl
+    if command -v serpl &> /dev/null; then
+        print_success "serpl: Installed ($(serpl --version))"
+    else
+        print_warning "serpl: Not found (requires Rust/Cargo)"
+    fi
+    
+    # Check ast-grep
+    if command -v ast-grep &> /dev/null; then
+        print_success "ast-grep: Installed ($(ast-grep --version | head -1))"
+    else
+        print_warning "ast-grep: Not found (part of serpl installation)"
+    fi
 }
 
 # Main installation function
@@ -325,6 +366,7 @@ main() {
     install_tmux
     copy_configurations
     install_nerd_font
+    install_serpl
     set_default_shell
     verify_installation
     
@@ -340,6 +382,9 @@ main() {
     echo "- If symbols don't display correctly, ensure you're using a Nerd Font"
     echo "- If plugins don't work, restart your terminal completely"
     echo "- Check individual README files in each directory for detailed guides"
+    echo ""
+    echo "Additional tools installed:"
+    echo "- serpl & ast-grep (terminal search & replace with AST support - requires Rust)"
 }
 
 # Run main function
