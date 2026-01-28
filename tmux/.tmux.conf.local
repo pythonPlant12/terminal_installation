@@ -85,24 +85,24 @@ tmux_conf_24b_colour=auto
 #   - tmux_conf_theme_synchronized
 tmux_conf_theme=enabled
 
-# rosé pine moon theme
-tmux_conf_theme_colour_1="#232136"    # base (background)
-tmux_conf_theme_colour_2="#393552"    # overlay
-tmux_conf_theme_colour_3="#6e6a86"    # muted
-tmux_conf_theme_colour_4="#3e8fb0"    # pine (teal)
-tmux_conf_theme_colour_5="#f6c177"    # gold
-tmux_conf_theme_colour_6="#232136"    # base
-tmux_conf_theme_colour_7="#e0def4"    # text
-tmux_conf_theme_colour_8="#232136"    # base
-tmux_conf_theme_colour_9="#f6c177"    # gold
-tmux_conf_theme_colour_10="#eb6f92"   # love (pink)
-tmux_conf_theme_colour_11="#9ccfd8"   # foam (light cyan)
-tmux_conf_theme_colour_12="#908caa"   # subtle
-tmux_conf_theme_colour_13="#e0def4"   # text
-tmux_conf_theme_colour_14="#232136"   # base
-tmux_conf_theme_colour_15="#2a273f"   # surface
-tmux_conf_theme_colour_16="#eb6f92"   # love (red/pink)
-tmux_conf_theme_colour_17="#e0def4"   # text
+# Islands Dark (PyCharm) theme
+tmux_conf_theme_colour_1="#191A1C"    # base (background)
+tmux_conf_theme_colour_2="#2B2D30"    # overlay
+tmux_conf_theme_colour_3="#6F737A"    # muted
+tmux_conf_theme_colour_4="#56A8F5"    # blue
+tmux_conf_theme_colour_5="#D5B778"    # gold
+tmux_conf_theme_colour_6="#191A1C"    # base
+tmux_conf_theme_colour_7="#BCBEC4"    # text
+tmux_conf_theme_colour_8="#191A1C"    # base
+tmux_conf_theme_colour_9="#CF8E6D"    # amber
+tmux_conf_theme_colour_10="#F75464"   # red
+tmux_conf_theme_colour_11="#2AACB8"   # cyan
+tmux_conf_theme_colour_12="#7A7E85"   # subtle
+tmux_conf_theme_colour_13="#CED0D6"   # bright text
+tmux_conf_theme_colour_14="#191A1C"   # base
+tmux_conf_theme_colour_15="#1F2024"   # surface
+tmux_conf_theme_colour_16="#C77DBB"   # magenta
+tmux_conf_theme_colour_17="#BCBEC4"   # text
 
 # default theme (ansi)
 #tmux_conf_theme_colour_1="colour0"
@@ -157,6 +157,10 @@ tmux_conf_theme_message_bg="$tmux_conf_theme_colour_5"
 tmux_conf_theme_message_attr="bold"
 
 # status line command style (<prefix> : Escape)
+# bind -T copy-mode-vi Escape send -X clear-selection
+
+bind -T copy-mode-vi Escape send -X clear-selection
+
 tmux_conf_theme_message_command_fg="$tmux_conf_theme_colour_5"
 tmux_conf_theme_message_command_bg="$tmux_conf_theme_colour_1"
 tmux_conf_theme_message_command_attr="bold"
@@ -361,6 +365,9 @@ tmux_conf_battery_status_discharging="↓"    # U+2193
 # you may want to use %I:%M %p in place of %R in tmux_conf_theme_status_right
 tmux_conf_theme_clock_colour="$tmux_conf_theme_colour_4"
 tmux_conf_theme_clock_style="24"
+
+# selection visibility (copy-mode + mouse)
+set -g mode-style "fg=#CED0D6,bg=#343539"
 
 
 # -- clipboard -----------------------------------------------------------------
