@@ -1,0 +1,16 @@
+<scheme name="_@user_Kanagawa Theme" version="142" parent_scheme="Darcula">
+  <option name="FONT_SCALE" value="1.0" />
+  <metaInfo>
+    <property name="ide">Python</property>
+    <property name="ideVersion">2024.3.1.1.0.0</property>
+    <property name="originalScheme">Kanagawa Theme</property>
+    <property name="partialSave">true</property>
+    <property name="pluginId">io.github.frykher.jetbrains-kanagawa-theme</property>
+  </metaInfo>
+  <option name="LINE_SPACING" value="0.85" />
+  <option name="EDITOR_FONT_SIZE" value="15" />
+  <option name="EDITOR_FONT_NAME" value="Victor Mono" />
+  <option name="CONSOLE_FONT_NAME" value="Victor Mono" />
+  <option name="CONSOLE_FONT_SIZE" value="16" />
+  <option name="CONSOLE_LINE_SPACING" value="0.7" />
+</scheme>

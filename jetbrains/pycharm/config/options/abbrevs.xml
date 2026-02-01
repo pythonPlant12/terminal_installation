@@ -1,0 +1,9 @@
+<application>
+  <component name="AbbreviationManager">
+    <abbreviations>
+      <action id="PreviousEditorTab">
+        <abbreviation name="pt" />
+      </action>
+    </abbreviations>
+  </component>
+</application>

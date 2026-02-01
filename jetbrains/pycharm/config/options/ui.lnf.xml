@@ -1,0 +1,15 @@
+<application>
+  <component name="ProjectViewFileNesting">
+    <nesting-rules>
+      <NestingRule child-file-suffix=".json.graphql" parent-file-suffix=".json" />
+    </nesting-rules>
+  </component>
+  <component name="UISettings">
+    <option name="DIFFERENTIATE_PROJECTS" value="false" />
+    <option name="EDITOR_TAB_PLACEMENT" value="3" />
+    <option name="OPEN_IN_PREVIEW_TAB_IF_POSSIBLE" value="true" />
+    <option name="REMEMBER_SIZE_FOR_EACH_TOOL_WINDOW_NEW_UI" value="true" />
+    <option name="showTreeIndentGuides" value="true" />
+    <option name="smoothScrolling" value="false" />
+  </component>
+</application>

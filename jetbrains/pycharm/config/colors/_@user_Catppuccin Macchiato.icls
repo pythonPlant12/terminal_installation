@@ -1,0 +1,41 @@
+<scheme name="_@user_Catppuccin Macchiato" version="142" parent_scheme="Darcula">
+  <metaInfo>
+    <property name="ide">Python</property>
+    <property name="ideVersion">2024.1.1.0.0</property>
+    <property name="originalScheme">Catppuccin Macchiato</property>
+    <property name="partialSave">true</property>
+    <property name="pluginId">com.github.catppuccin.jetbrains</property>
+  </metaInfo>
+  <attributes>
+    <option name="DEFAULT_CLASS_NAME">
+      <value>
+        <option name="FOREGROUND" value="eed49f" />
+      </value>
+    </option>
+    <option name="DEFAULT_FUNCTION_CALL">
+      <value>
+        <option name="FOREGROUND" value="8aadf4" />
+      </value>
+    </option>
+    <option name="DEFAULT_FUNCTION_DECLARATION">
+      <value>
+        <option name="FOREGROUND" value="8aadf4" />
+      </value>
+    </option>
+    <option name="DEFAULT_INTERFACE_NAME">
+      <value>
+        <option name="FOREGROUND" value="eed49f" />
+      </value>
+    </option>
+    <option name="DEFAULT_METADATA">
+      <value>
+        <option name="FOREGROUND" value="eed49f" />
+      </value>
+    </option>
+    <option name="DEFAULT_PARAMETER">
+      <value>
+        <option name="FOREGROUND" value="ee99a0" />
+      </value>
+    </option>
+  </attributes>
+</scheme>

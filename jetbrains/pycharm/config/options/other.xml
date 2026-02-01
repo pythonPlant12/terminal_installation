@@ -1,0 +1,127 @@
+<application>
+  <component name="ActionHistoryManager">
+    <ids>
+      <option value="Synchronize" />
+      <option value="Git.CompareWithBranch" />
+      <option value="CompareTwoFiles" />
+      <option value="MoreRunToolbarActions" />
+      <option value="ProjectView.AutoscrollFromSource" />
+      <option value="Git.Pull" />
+      <option value="Git.Merge" />
+      <option value="Git.Unstash" />
+      <option value="Vcs.Push" />
+      <option value="ChangesView.ToggleCommitUi" />
+      <option value="ChangesView.Revert" />
+      <option value="RecentProjectListGroup" />
+      <option value="Docker.RemoteServers.OpenProject" />
+      <option value="$LRU" />
+      <option value="OpenFile" />
+      <option value="Git.Stash.Apply" />
+      <option value="Git.Stash.UnstashAs" />
+      <option value="Git.Stash" />
+      <option value="Git.Stash.Pop" />
+      <option value="Git.Show.Stash" />
+      <option value="WelcomeScreen.MoveToGroup" />
+      <option value="MoveMinimap" />
+      <option value="MoveEditorToOppositeTabGroup" />
+      <option value="WelcomeScreen.Plugins" />
+    </ids>
+  </component>
+  <component name="AppInspectionProfilesVisibleTreeState">
+    <entry key="Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id>JavaScript and TypeScript</id>
+          </State>
+          <State>
+            <id>OpenAPI specifications</id>
+          </State>
+          <State>
+            <id>Python</id>
+          </State>
+          <State>
+            <id>ReactJavaScript and TypeScript</id>
+          </State>
+          <State>
+            <id>SQL</id>
+          </State>
+        </expanded-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="FileEditorProviderManager">{}</component>
+  <component name="LangManager">
+    <option name="languageName" value="Python" />
+  </component>
+  <component name="NotRoamableUiSettings">
+    <option name="fontFace" value="Victor Mono" />
+    <option name="fontSize" value="13.0" />
+    <option name="presentationModeIdeScale" value="1.75" />
+    <option name="overrideLafFonts" value="true" />
+  </component>
+  <component name="PropertyService"><![CDATA[{
+  "keyToString": {
+    "ColorChooser.RecentColors": "124-166-134-255,,,156-210-169-255,,,168-210-156-255,,,184-219-174-255,,,174-219-183-255,,,174-219-209-255,,,219-188-174-255,,,202-164-147-255,,,202-199-147-255,,,171-106-135-255,,,171-162-106-255,,,219-163-157-255,,,86-168-245-255,,,219-196-255-255,,,212-188-250-255,,,190-158-239-255,,,168-125-234-255,,,181-164-226-255",
+    "FindSplitterProportion": "0.2843016",
+    "InstalledPluginsSearchHistory": "error\ner\ne\ninspection\ninspection lens",
+    "KEYMAP": "decrease font\nincrease font\nzoom\nscroll\ncommit",
+    "LAST_CALCULATED_COLOR_INDEX_KEY": "3",
+    "LAST_EXTRACTOR_SCRIPTS_CLEANUP_VERSION/data/aggregators": "PY-253.29346.308",
+    "MarketplacePluginsSearchHistory": "inspection lens\nerror\ninspec\ninlineerror\ninline",
+    "PyCharm.InitialConfiguration": "true",
+    "PyCharm.InitialConfiguration.V2": "true",
+    "PyCharm.InitialConfiguration.V3": "true",
+    "PyCharm.InitialConfiguration.V4": "true",
+    "PyCharm.InitialConfiguration.V5": "true",
+    "PyCharm.InitialConfiguration.V6": "true",
+    "PyCharm.InitialConfiguration.V7": "true",
+    "PyCharm.InitialConfiguration.V8": "true",
+    "RunOnceActivity.TerminalFontSettingsService.fixStoredNonMonospacedFonts": "true",
+    "RunOnceActivity.TerminalOptionsProvider.migration.2025.1.1": "true",
+    "RunOnceActivity.VFSInitializationConditionsToFusReporter": "true",
+    "RunOnceActivity.git.modal.commit.toggle": "true",
+    "RunOnceActivity.reset.auto.reparse.settings.to.default": "true",
+    "SettingsSearchHistory": "plugins\nkeymap\nlint\nplugin\nerror",
+    "ShowUsagesActions.splitterServiceKey": "0.33404028",
+    "enter_selection_count": "5",
+    "evlsprt3.253": "5",
+    "experimental.ui.on.first.startup": "true",
+    "experimental.ui.used.version": "253.30387.127",
+    "experimentalFeature.terminal.shell.command.handling": "false",
+    "fileTypeChangedCounter": "59",
+    "fontSizeToResetConsole": "14.5",
+    "fontSizeToResetEditor": "14.5",
+    "got.it.tooltip.Plugins Auto-Update": "1",
+    "got.it.tooltip.speed.search.shown": "1",
+    "ide.islands.ab3": "true",
+    "llm.installer.last.toolwindow.state": "LLM_INSTALLER",
+    "migrated.non.roamable.values.from.general.settings": "true",
+    "previousColorScheme": "_@user_Islands Dark",
+    "pycharm.welcome.overridden": "true",
+    "registry.to.advanced.settings.migration.build": "PY-253.30387.127",
+    "selected.color.option.type": "DEFAULT_STRING",
+    "settings.code.style.selected.tab.Python": "Blank Lines",
+    "terminal.gen.one.option.visible": "false",
+    "toolwindow.showToolWindowsNames.ts": "2026-01-28T13:17:00.089562",
+    "trial.state.last.availability.check": "1769589732302",
+    "trial.state.last.availability.state": "true",
+    "trial.state.last.state": "TRIAL_AVAILABLE",
+    "ts.lib.d.ts.version": "5.9.3",
+    "vcs.branch.view.splitter.proportion": "0.15532787",
+    "whats.new.last.shown.version": "2025-3.1.1-29346-0840774b30dc737738640b276d8a87a71eb7ecff"
+  },
+  "keyToStringList": {
+    "fileTypeDetectors": [
+      "com.intellij.ide.scratch.ScratchFileServiceImpl$Detector",
+      "com.tang.intellij.lua.lang.LuaFileTypeDetector",
+      "com.intellij.database.vfs.DbStorageFileType$Detector",
+      "com.intellij.docker.dockerFile.DockerFileTypeDetector",
+      "com.intellij.javascript.debugger.sourcemap.SourceMapFileType$MyFileTypeDetector",
+      "com.jetbrains.nodejs.util.NodeFileTypeDetector$JavaScriptFileTypeDetector",
+      "com.jetbrains.nodejs.util.NodeFileTypeDetector$TypeScriptFileTypeDetector",
+      "org.jetbrains.plugins.textmate.TextMateFileType$TextMateFileDetector"
+    ]
+  }
+}]]></component>
+</application>

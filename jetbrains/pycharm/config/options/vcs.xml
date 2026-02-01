@@ -1,0 +1,15 @@
+<application>
+  <component name="Vcs.Log.App.Settings">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Subject" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="GitHub.CommitStatus" />
+      </list>
+    </option>
+    <option name="DIFF_PREVIEW_VERTICAL_SPLIT" value="false" />
+    <option name="SHOW_CHANGES_FROM_PARENTS" value="true" />
+  </component>
+</application>

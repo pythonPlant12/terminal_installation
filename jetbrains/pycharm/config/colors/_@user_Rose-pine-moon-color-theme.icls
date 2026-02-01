@@ -1,0 +1,12 @@
+<scheme name="_@user_Rose-pine-moon-color-theme" version="142" parent_scheme="Darcula">
+  <metaInfo>
+    <property name="ide">Python</property>
+    <property name="ideVersion">2024.3.1.1.0.0</property>
+    <property name="originalScheme">Rose-pine-moon-color-theme</property>
+    <property name="partialSave">true</property>
+    <property name="pluginId">com.github.jmorjsm.rosepineintellij</property>
+  </metaInfo>
+  <colors>
+    <option name="SELECTION_BACKGROUND" value="6878a1" />
+  </colors>
+</scheme>

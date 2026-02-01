@@ -1,0 +1,13 @@
+<scheme name="_@user_Rose-pine-dawn-color-theme" version="142" parent_scheme="Default">
+  <option name="FONT_SCALE" value="1.0" />
+  <metaInfo>
+    <property name="ide">Python</property>
+    <property name="ideVersion">2024.3.1.1.0.0</property>
+    <property name="originalScheme">Rose-pine-dawn-color-theme</property>
+    <property name="partialSave">true</property>
+    <property name="pluginId">com.github.jmorjsm.rosepineintellij</property>
+  </metaInfo>
+  <option name="LINE_SPACING" value="1.0" />
+  <option name="EDITOR_FONT_SIZE" value="14" />
+  <option name="EDITOR_FONT_NAME" value="JetBrainsMono Nerd Font" />
+</scheme>

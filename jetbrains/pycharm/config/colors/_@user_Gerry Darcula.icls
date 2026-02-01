@@ -1,0 +1,13 @@
+<scheme name="_@user_Gerry Darcula" version="142" parent_scheme="Darcula">
+  <option name="FONT_SCALE" value="1.0" />
+  <metaInfo>
+    <property name="ide">Python</property>
+    <property name="ideVersion">2024.1.3.0.0</property>
+    <property name="originalScheme">Gerry Darcula</property>
+    <property name="partialSave">true</property>
+    <property name="pluginId">com.jetbrains.gerryPurpleTheme</property>
+  </metaInfo>
+  <option name="LINE_SPACING" value="1.0" />
+  <option name="EDITOR_FONT_SIZE" value="13" />
+  <option name="EDITOR_FONT_NAME" value="Inter Regular" />
+</scheme>

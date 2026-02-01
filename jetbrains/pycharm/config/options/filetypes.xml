@@ -1,0 +1,21 @@
+<application>
+  <component name="FileTypeManager" version="19">
+    <ignoreFiles list="*$py.class;*.pyc;*.pyo;*.rbc;*.yarb;*~;.DS_Store;.git;.hg;.mypy_cache;.pytest_cache;.ruff_cache;.svn;CVS;__pycache__;_svn;vssver.scc;vssver2.scc" />
+    <extensionMap>
+      <mapping pattern="mcp.json" type="JSON5" />
+      <mapping ext="webp" type="Native" />
+      <mapping ext="mp4" type="PLAIN_TEXT" />
+      <removed_mapping ext="csv" approved="true" type="CSV/TSV" />
+      <removed_mapping ext="csv" approved="true" type="CSV/TSV" />
+      <removed_mapping ext="env" approved="true" type=".env file" />
+      <removed_mapping ext="env" approved="true" type=".env file" />
+      <removed_mapping ext="gql" approved="true" type="Graql" />
+      <removed_mapping ext="gql" approved="true" type="Graql" />
+      <removed_mapping ext="tsv" approved="true" type="CSV/TSV" />
+      <removed_mapping ext="tsv" approved="true" type="CSV/TSV" />
+      <removed_mapping ext="webp" approved="true" type="Image" />
+      <removed_mapping pattern=".env" approved="true" type=".env file" />
+      <removed_mapping pattern=".env.*" approved="true" type=".env file" />
+    </extensionMap>
+  </component>
+</application>

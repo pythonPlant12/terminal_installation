@@ -1,0 +1,90 @@
+" .ideavimrc - Vim-specific shortcuts from VS Code
+" =================================================
+set clipboard+=unnamed
+set scrolloff=5
+
+" Keep deletions out of the clipboard; always copy on change.
+nnoremap d "_d
+nnoremap D "_D
+nnoremap x "_x
+nnoremap X "_X
+nnoremap s "_s
+nnoremap dd "_dd
+vnoremap d "_d
+vnoremap x "_x
+vnoremap s "_s
+nnoremap j k
+nnoremap k j
+vnoremap j k
+vnoremap k j
+
+nnoremap c "+c
+nnoremap C "+C
+nnoremap cc "+cc
+vnoremap c "+c
+vnoremap C "+C
+
+" Ctrl+w h/j/k/l to move focus between splits.
+nnoremap <C-w>h <C-w>h
+nnoremap <C-w>j <C-w>k
+nnoremap <C-w>k <C-w>j
+nnoremap <C-w>l <C-w>l
+nnoremap <C-w>z :action MaximizeToolWindow<CR>
+nnoremap <C-w><Esc> <Esc>
+nnoremap <C-w>v :action SplitVertically<CR>
+nnoremap <C-w>s :action SplitHorizontally<CR>
+nnoremap <C-w>d :action CloseActiveTab<CR>
+
+" Shift+w / Shift+b to line end / start.
+nnoremap W $
+nnoremap B ^
+vnoremap W $
+vnoremap B ^
+
+nnoremap zc za
+
+" Tab inserts a tab character at start of line in normal mode.
+nnoremap <Tab> 0i<Tab><Esc>
+
+" Cmd+j / Cmd+k to switch tabs (j=previous, k=next).
+nnoremap <D-j> :action PreviousTab<CR>
+nnoremap <D-k> :action NextTab<CR>
+
+" Cmd+Shift+j/k move tab left/right (within window)
+nnoremap <D-S-j> :action MoveTabLeft<CR>
+nnoremap <D-S-k> :action MoveTabRight<CR>
+
+" Cmd+Shift+h/l move tab to left/right window
+nnoremap <D-S-h> :action MoveTabToPreviousWindow<CR>
+nnoremap <D-S-l> :action MoveTabToNextWindow<CR>
+
+" Leader mappings (Space)
+let mapleader=" "
+nnoremap <leader>cf :action ReformatCode<CR>
+nnoremap <leader>ce :action ESLintFix<CR>
+nnoremap <leader>fp :action CopyContentRootPath<CR>
+nnoremap <leader>fP :action CopyAbsolutePath<CR>
+
+" Shift+K to show quick documentation / errors popup
+nnoremap K :action QuickDocumentation<CR>
+
+" Cmd+3 to toggle Commit tool window
+nnoremap <D-3> :action ActivateCommitToolWindow<CR>
+
+" cB / cW change to line start/end (matches B/W mappings); xB / xW delete to line start/end
+nnoremap cB c^
+nnoremap cW c$
+nnoremap xB d^
+nnoremap xW d$
+
+" Git mappings (Ctrl+g chord)
+nnoremap <C-g>p :action Vcs.UpdateProject<CR>
+nnoremap <C-g>P :action Vcs.Push<CR>
+nnoremap <C-g>C :action CheckinProject<CR>
+nnoremap <C-g>c :action Git.Branches<CR>
+nnoremap <C-g>F :action Git.Fetch<CR>
+nnoremap <C-g>ld :action VcsShowCurrentChangeMarker<CR>
+nnoremap <C-g>fd :action Compare.SameVersion<CR>
+nnoremap <C-g>fh :action Vcs.ShowTabbedFileHistory<CR>
+nnoremap <leader>gf :action GotoFile<CR>
+nnoremap gl :action GotoLine<CR>

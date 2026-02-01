@@ -1,0 +1,36 @@
+<scheme name="_@user_Islands Dark" version="142" parent_scheme="Darcula">
+  <metaInfo>
+    <property name="ide">Python</property>
+    <property name="ideVersion">2025.3.2.0.0</property>
+    <property name="originalScheme">Islands Dark</property>
+    <property name="partialSave">true</property>
+    <property name="pluginId">com.intellij</property>
+  </metaInfo>
+  <attributes>
+    <option name="DEFAULT_CLASS_NAME">
+      <value>
+        <option name="FOREGROUND" value="dba39d" />
+      </value>
+    </option>
+    <option name="DEFAULT_CLASS_REFERENCE">
+      <value>
+        <option name="FOREGROUND" value="dba39d" />
+      </value>
+    </option>
+    <option name="DEFAULT_FUNCTION_CALL">
+      <value>
+        <option name="FOREGROUND" value="56a8f5" />
+      </value>
+    </option>
+    <option name="DEFAULT_PARAMETER">
+      <value>
+        <option name="FOREGROUND" value="dbc4ff" />
+      </value>
+    </option>
+    <option name="DEFAULT_STRING">
+      <value>
+        <option name="FOREGROUND" value="7ca686" />
+      </value>
+    </option>
+  </attributes>
+</scheme>
