@@ -1,0 +1,8 @@
+macos-option-as-alt = true
+window-theme = system
+window-decoration = false
+font-family = "Victor Mono"
+font-size = 15.5
+adjust-cell-height=-5%
+adjust-cell-width=-7%
+macos-non-native-fullscreen=false

@@ -60,6 +60,7 @@ nnoremap <D-S-l> :action MoveTabToNextWindow<CR>
 
 " Leader mappings (Space)
 let mapleader=" "
+nnoremap <leader>ca :action ShowIntentionActions<CR>
 nnoremap <leader>cf :action ReformatCode<CR>
 nnoremap <leader>ce :action ESLintFix<CR>
 nnoremap <leader>fp :action CopyContentRootPath<CR>

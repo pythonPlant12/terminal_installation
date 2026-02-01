@@ -252,6 +252,72 @@ set_default_shell() {
     fi
 }
 
+# Install and configure Ghostty
+install_ghostty() {
+    print_step "Installing and configuring Ghostty..."
+
+    if ! command -v ghostty &> /dev/null; then
+        print_info "Installing Ghostty via Homebrew..."
+        brew install --cask ghostty
+        print_success "Ghostty installed"
+    else
+        print_success "Ghostty already installed"
+    fi
+
+    GHOSTTY_DIR="$HOME/Library/Application Support/com.mitchellh.ghostty"
+    mkdir -p "$GHOSTTY_DIR"
+    if [[ -f "$GHOSTTY_DIR/config" ]]; then
+        print_info "Backed up existing Ghostty config"
+        cp "$GHOSTTY_DIR/config" "$backup_dir/ghostty-config" 2>/dev/null || true
+    fi
+    cp "ghostty/config" "$GHOSTTY_DIR/config"
+    print_success "Ghostty configured"
+}
+
+# Install PyCharm configuration
+install_pycharm_config() {
+    print_step "Installing PyCharm configuration..."
+
+    PYCHARM_BASE="$HOME/Library/Application Support/JetBrains"
+    PYCHARM_DIR=$(find "$PYCHARM_BASE" -maxdepth 1 -type d -name "PyCharm*" 2>/dev/null | sort -V | tail -1)
+
+    if [[ -z "$PYCHARM_DIR" ]]; then
+        print_warning "No PyCharm config directory found. Skipping (launch PyCharm once first)."
+        return
+    fi
+
+    print_info "Detected PyCharm config: $PYCHARM_DIR"
+
+    # Keymaps
+    mkdir -p "$PYCHARM_DIR/keymaps"
+    cp jetbrains/pycharm/config/keymaps/*.xml "$PYCHARM_DIR/keymaps/"
+
+    # Code styles
+    mkdir -p "$PYCHARM_DIR/codestyles"
+    cp jetbrains/pycharm/config/codestyles/*.xml "$PYCHARM_DIR/codestyles/"
+
+    # Color schemes
+    mkdir -p "$PYCHARM_DIR/colors"
+    cp jetbrains/pycharm/config/colors/*.icls "$PYCHARM_DIR/colors/"
+
+    # Inspection profiles
+    mkdir -p "$PYCHARM_DIR/inspection"
+    cp jetbrains/pycharm/config/inspection/*.xml "$PYCHARM_DIR/inspection/"
+
+    # Options
+    mkdir -p "$PYCHARM_DIR/options"
+    cp jetbrains/pycharm/config/options/*.xml "$PYCHARM_DIR/options/"
+    if [[ -d "jetbrains/pycharm/config/options/mac" ]]; then
+        mkdir -p "$PYCHARM_DIR/options/mac"
+        cp jetbrains/pycharm/config/options/mac/* "$PYCHARM_DIR/options/mac/"
+    fi
+
+    # .ideavimrc
+    cp jetbrains/pycharm/config/ideavimrc "$HOME/.ideavimrc"
+
+    print_success "PyCharm configuration installed"
+}
+
 # Install serpl (terminal search and replace tool)
 install_serpl() {
     print_step "Installing serpl..."
@@ -337,6 +403,34 @@ verify_installation() {
         print_warning "Tmux config: Not found (optional)"
     fi
     
+    # Check Ghostty
+    if command -v ghostty &> /dev/null; then
+        print_success "Ghostty: Installed"
+    else
+        print_error "Ghostty: Not found"
+    fi
+
+    GHOSTTY_DIR="$HOME/Library/Application Support/com.mitchellh.ghostty"
+    if [[ -f "$GHOSTTY_DIR/config" ]]; then
+        print_success "Ghostty config: Applied"
+    else
+        print_error "Ghostty config: Not found"
+    fi
+
+    # Check PyCharm config
+    PYCHARM_DIR=$(find "$HOME/Library/Application Support/JetBrains" -maxdepth 1 -type d -name "PyCharm*" 2>/dev/null | sort -V | tail -1)
+    if [[ -n "$PYCHARM_DIR" ]]; then
+        print_success "PyCharm config: Applied ($PYCHARM_DIR)"
+    else
+        print_warning "PyCharm config: Skipped (not installed)"
+    fi
+
+    if [[ -f "$HOME/.ideavimrc" ]]; then
+        print_success ".ideavimrc: Applied"
+    else
+        print_warning ".ideavimrc: Not found"
+    fi
+
     # Check serpl
     if command -v serpl &> /dev/null; then
         print_success "serpl: Installed ($(serpl --version))"
@@ -366,6 +460,8 @@ main() {
     install_tmux
     copy_configurations
     install_nerd_font
+    install_ghostty
+    install_pycharm_config
     install_serpl
     set_default_shell
     verify_installation
