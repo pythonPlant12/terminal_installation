@@ -63,6 +63,7 @@ let mapleader=" "
 nnoremap <leader>ca :action ShowIntentionActions<CR>
 nnoremap <leader>cf :action ReformatCode<CR>
 nnoremap <leader>ce :action ESLintFix<CR>
+nnoremap <leader>rv :action RenameElement<CR>
 nnoremap <leader>fp :action CopyContentRootPath<CR>
 nnoremap <leader>fP :action CopyAbsolutePath<CR>
 
@@ -87,5 +88,8 @@ nnoremap <C-g>F :action Git.Fetch<CR>
 nnoremap <C-g>ld :action VcsShowCurrentChangeMarker<CR>
 nnoremap <C-g>fd :action Compare.SameVersion<CR>
 nnoremap <C-g>fh :action Vcs.ShowTabbedFileHistory<CR>
+nnoremap <C-g>lz :action Vcs.RollbackChangedLines<CR>
+nnoremap <C-g>fz :action ChangesView.Revert<CR>
+nnoremap <C-g>fb :action Annotate<CR>
 nnoremap <leader>gf :action GotoFile<CR>
 nnoremap gl :action GotoLine<CR>
