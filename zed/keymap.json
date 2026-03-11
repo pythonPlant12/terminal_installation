@@ -1,0 +1,160 @@
+[
+  {
+    "bindings": {
+      "cmd-m": null,
+      "shift-f12": "workspace::ToggleAllDocks"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == normal && !menu",
+    "bindings": {
+      "j": "vim::Up",
+      "k": "vim::Down",
+
+      "shift-w": "vim::EndOfLine",
+      "shift-b": "vim::FirstNonWhitespace",
+
+      "z c": "editor::ToggleFold",
+
+      "ctrl-w h": "workspace::ActivatePaneLeft",
+      "ctrl-w j": "workspace::ActivatePaneUp",
+      "ctrl-w k": "workspace::ActivatePaneDown",
+      "ctrl-w l": "workspace::ActivatePaneRight",
+      "ctrl-w v": "pane::SplitRight",
+      "ctrl-w s": "pane::SplitDown",
+      "ctrl-w d": "pane::CloseActiveItem",
+      "ctrl-w z": "workspace::ToggleZoom",
+
+      "ctrl-shift-j": "pane::SwapItemLeft",
+      "ctrl-shift-k": "pane::SwapItemRight",
+
+      "ctrl-i": "pane::GoBack",
+      "ctrl-o": "pane::GoForward",
+      "cmd-i": "pane::GoBack",
+      "cmd-o": "pane::GoForward",
+
+      "space i": "pane::GoForward",
+      "space o": "pane::GoBack",
+
+      "space c a": "editor::ToggleCodeActions",
+      "space c f": "editor::Format",
+      "space c e": "editor::Format",
+      "space r v": "editor::Rename",
+
+      "space f p": "editor::CopyRelativePath",
+      "space f shift-p": "editor::CopyPath",
+
+      "space k": "editor::Hover",
+
+      "space g f": "file_finder::Toggle",
+
+      "g r": "editor::FindAllReferences",
+
+      "ctrl-m": "editor::Hover",
+      "ctrl-e": "editor::Hover",
+
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+
+      "space g l": "go_to_line::Toggle",
+
+      "ctrl-g b": "editor::ToggleGitBlame",
+      "ctrl-g l d": "editor::GoToHunk",
+      "ctrl-g l r": "editor::RevertSelectedHunks",
+      "ctrl-g f d": "editor::ToggleHunkDiff",
+      "ctrl-g f b": "editor::ToggleGitBlame",
+      "ctrl-g f r": ["git::RestoreFile", { "skip_prompt": false }],
+      "ctrl-g w d": "git::Diff",
+
+      "cmd-subtract": "editor::FoldAll",
+      "cmd-shift-subtract": "editor::UnfoldAll",
+
+      "tab": "editor::Indent",
+      "shift-tab": "editor::Outdent",
+
+      "ctrl-shift-up": "editor::MoveLineUp",
+      "ctrl-shift-down": "editor::MoveLineDown",
+
+      "ctrl-j": "pane::ActivatePreviousItem",
+      "ctrl-k": "pane::ActivateNextItem"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == visual && !menu",
+    "bindings": {
+      "j": "vim::Up",
+      "k": "vim::Down",
+
+      "shift-w": "vim::EndOfLine",
+      "shift-b": "vim::FirstNonWhitespace",
+
+      "ctrl-shift-up": "editor::MoveLineUp",
+      "ctrl-shift-down": "editor::MoveLineDown",
+
+      "ctrl-j": "pane::ActivatePreviousItem",
+      "ctrl-k": "pane::ActivateNextItem"
+    }
+  },
+  {
+    "context": "Editor && showing_completions",
+    "bindings": {
+      "tab": null
+    }
+  },
+  {
+    "context": "Editor && vim_mode == insert",
+    "bindings": {
+      "ctrl-j": "pane::ActivatePreviousItem",
+      "ctrl-k": "pane::ActivateNextItem"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-j": "pane::ActivatePreviousItem",
+      "ctrl-k": "pane::ActivateNextItem"
+    }
+  },
+  {
+    "context": "ProjectPanel",
+    "bindings": {
+      "shift-enter": "project_panel::Rename",
+      "cmd-n": "project_panel::NewFile",
+      "cmd-c": "project_panel::CopyRelativePath",
+      "cmd-shift-c": "project_panel::CopyPath"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-b b": ["task::Spawn", { "task_name": "Bookmark: Add bookmark" }],
+      "ctrl-b l": ["task::Spawn", { "task_name": "Bookmark: Find bookmark" }],
+
+      "cmd-1": "project_panel::ToggleFocus",
+      "cmd-2": "outline_panel::ToggleFocus",
+      "cmd-3": "git_panel::ToggleFocus",
+      "cmd-4": "outline_panel::ToggleFocus",
+      "cmd-5": "diagnostics::Deploy",
+      "cmd-t": "terminal_panel::ToggleFocus",
+      "cmd-g": "git_panel::ToggleFocus",
+      "cmd-shift-m": "workspace::ToggleZoom",
+
+      "cmd-[": "pane::GoBack",
+      "cmd-]": "pane::GoForward",
+
+      "cmd-shift-n": "file_finder::Toggle",
+      "cmd-shift-c": "project_symbols::Toggle",
+      "cmd-shift-p": "command_palette::Toggle",
+
+      "cmd-j": "pane::ActivatePreviousItem",
+      "cmd-k": "pane::ActivateNextItem",
+      "ctrl-j": "pane::ActivatePreviousItem",
+      "ctrl-k": "pane::ActivateNextItem",
+
+      "cmd-shift-i": "editor::Format",
+
+      "cmd-shift-=": "zed::IncreaseBufferFontSize",
+      "cmd-minus": "zed::DecreaseBufferFontSize"
+    }
+  }
+]

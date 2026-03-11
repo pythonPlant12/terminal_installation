@@ -11,6 +11,7 @@ This package contains configurations and installation guides for:
 - **💡 zsh-autosuggestions** - Fish-like command suggestions
 - **⚡ zsh-autocomplete** - Real-time autocomplete with menu selection
 - **🖥️ Tmux + Oh My Tmux** - Terminal multiplexer with beautiful configuration
+- **⌨️ Zed** - High-performance code editor configured with Islands Dark theme, Victor Mono font, vim mode, and PyCharm-inspired keybindings
 
 ## Quick Installation
 
@@ -87,7 +88,24 @@ ln -s -f ~/.tmux/.tmux.conf ~/.tmux.conf
 cp tmux/.tmux.conf.local ~/.tmux.conf.local
 ```
 
-### 5. Apply Configuration
+### 5. Install Zed
+```bash
+# macOS
+brew install --cask zed
+
+# Copy configuration
+mkdir -p ~/.config/zed/themes
+cp zed/settings.json ~/.config/zed/settings.json
+cp zed/keymap.json ~/.config/zed/keymap.json
+cp zed/tasks.json ~/.config/zed/tasks.json
+cp zed/themes/islands-dark.json ~/.config/zed/themes/islands-dark.json
+```
+
+Install these Zed extensions manually via `cmd-shift-p` -> `zed: extensions`:
+- `Groovy`
+- `Bookmark language server`
+
+### 6. Apply Configuration
 ```bash
 # Reload shell configuration
 source ~/.zshrc
@@ -132,6 +150,12 @@ terminal_installation/
 ├── starship/
 │   ├── starship.toml        # Starship configuration
 │   └── README.md            # Starship installation guide
+├── zed/
+│   ├── settings.json        # Zed settings
+│   ├── keymap.json          # Zed keybindings
+│   ├── tasks.json           # Zed tasks
+│   └── themes/
+│       └── islands-dark.json # Zed theme
 ├── zsh-autosuggestions/
 │   ├── zsh-autosuggestions/ # Plugin source code
 │   └── README.md            # Installation guide

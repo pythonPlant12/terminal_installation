@@ -274,6 +274,44 @@ install_ghostty() {
     print_success "Ghostty configured"
 }
 
+install_zed() {
+    print_step "Installing and configuring Zed..."
+
+    if ! command -v zed &> /dev/null; then
+        print_info "Installing Zed via Homebrew..."
+        brew install --cask zed
+        print_success "Zed installed"
+    else
+        print_success "Zed already installed"
+    fi
+
+    local zed_backup_dir="${backup_dir:-$HOME/.zed_config_backup_$(date +%Y%m%d_%H%M%S)}"
+    mkdir -p "$HOME/.config/zed/themes" "$zed_backup_dir"
+
+    if [[ -f "$HOME/.config/zed/settings.json" ]]; then
+        cp "$HOME/.config/zed/settings.json" "$zed_backup_dir/settings.json" 2>/dev/null || true
+    fi
+
+    if [[ -f "$HOME/.config/zed/keymap.json" ]]; then
+        cp "$HOME/.config/zed/keymap.json" "$zed_backup_dir/keymap.json" 2>/dev/null || true
+    fi
+
+    if [[ -f "$HOME/.config/zed/tasks.json" ]]; then
+        cp "$HOME/.config/zed/tasks.json" "$zed_backup_dir/tasks.json" 2>/dev/null || true
+    fi
+
+    if [[ -f "$HOME/.config/zed/themes/islands-dark.json" ]]; then
+        cp "$HOME/.config/zed/themes/islands-dark.json" "$zed_backup_dir/islands-dark.json" 2>/dev/null || true
+    fi
+
+    cp "zed/settings.json" "$HOME/.config/zed/settings.json"
+    cp "zed/keymap.json" "$HOME/.config/zed/keymap.json"
+    cp "zed/tasks.json" "$HOME/.config/zed/tasks.json"
+    cp "zed/themes/islands-dark.json" "$HOME/.config/zed/themes/islands-dark.json"
+
+    print_success "Zed installed and configured"
+}
+
 # Install PyCharm configuration
 install_pycharm_config() {
     print_step "Installing PyCharm configuration..."
@@ -431,6 +469,18 @@ verify_installation() {
         print_warning ".ideavimrc: Not found"
     fi
 
+    if command -v zed &> /dev/null; then
+        print_success "Zed: Installed"
+    else
+        print_error "Zed: Not found"
+    fi
+
+    if [[ -f "$HOME/.config/zed/settings.json" ]]; then
+        print_success "Zed config: Applied"
+    else
+        print_error "Zed config: Not found"
+    fi
+
     # Check serpl
     if command -v serpl &> /dev/null; then
         print_success "serpl: Installed ($(serpl --version))"
@@ -461,6 +511,7 @@ main() {
     copy_configurations
     install_nerd_font
     install_ghostty
+    install_zed
     install_pycharm_config
     install_serpl
     set_default_shell

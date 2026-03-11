@@ -1,0 +1,154 @@
+{
+  "zoomed_padding": true,
+  "active_pane_modifiers": {
+    "border_size": 0.0,
+    "inactive_opacity": 1.0
+  },
+  "use_system_window_tabs": false,
+  "bottom_dock_layout": "full",
+  "preview_tabs": {
+    "enable_keep_preview_on_code_navigation": true,
+    "enable_preview_multibuffer_from_code_navigation": true,
+    "enable_preview_from_file_finder": true
+  },
+  "tabs": {
+    "show_diagnostics": "all",
+    "file_icons": true,
+    "git_status": false
+  },
+  "tab_bar": {
+    "show_pinned_tabs_in_separate_row": false,
+    "show_tab_bar_buttons": false,
+    "show_nav_history_buttons": false,
+    "show": true
+  },
+  "title_bar": {
+    "show_menus": false,
+    "show_project_items": true,
+    "show_branch_name": true,
+    "show_branch_icon": true
+  },
+  "project_panel": {
+    "diagnostic_badges": true,
+    "button": true
+  },
+  "search": {
+    "button": false
+  },
+  "file_finder": {
+    "modal_max_width": "large"
+  },
+  "tab_size": 2,
+  "show_signature_help_after_edits": true,
+  "colorize_brackets": true,
+  "icon_theme": "Colored Zed Icons Theme Dark",
+  "ui_font_family": "Victor Mono",
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  },
+  "session": {
+    "trust_all_worktrees": true
+  },
+  "vim_mode": true,
+  "terminal": {
+    "env": {
+      "FIG_NEW_SESSION": "\"1\""
+    },
+    "font_size": 14.0,
+    "font_family": "Victor Mono",
+    "line_height": {
+      "custom": 1.05
+    }
+  },
+  "relative_line_numbers": "enabled",
+  "gutter": {
+    "line_numbers": true
+  },
+  "cursor_shape": "block",
+  "vim": {
+    "use_system_clipboard": "on_yank",
+    "cursor_shape": {
+      "normal": "block",
+      "insert": "bar",
+      "visual": "hollow",
+      "replace": "underline"
+    }
+  },
+  "buffer_font_family": "Victor Mono",
+  "buffer_font_features": {
+    "calt": true
+  },
+  "base_keymap": "VSCode",
+  "ui_font_size": 16,
+  "buffer_font_size": 15.0,
+  "languages": {
+    "Groovy": {},
+    "Plain Text": {
+      "language_servers": ["bookmark-language-server"]
+    },
+    "JavaScript": {
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
+    },
+    "JSX": {
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
+    },
+    "TypeScript": {
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
+    },
+    "TSX": {
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
+    },
+    "Vue": {
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
+    }
+  },
+  "file_types": {
+    "Groovy": ["Jenkinsfile", "*.jenkinsfile", "*.groovy"]
+  },
+  "toolbar": {
+    "breadcrumbs": true
+  },
+  "minimap": {
+    "show": "always"
+  },
+  "lsp": {
+    "eslint": {
+      "settings": {
+        "workingDirectory": {
+          "mode": "auto"
+        }
+      }
+    }
+  },
+  "code_actions_on_format": {},
+  "indent_guides": {
+    "enabled": true,
+    "line_width": 1,
+    "active_line_width": 2,
+    "coloring": "indent_aware",
+    "background_coloring": "disabled"
+  },
+  "inlay_hints": {
+    "enabled": true,
+    "show_type_hints": true,
+    "show_parameter_hints": true,
+    "show_other_hints": true
+  },
+  "format_on_save": "off",
+  "theme": {
+    "mode": "dark",
+    "light": "One Light",
+    "dark": "Islands Dark"
+  }
+}

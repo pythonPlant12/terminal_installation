@@ -386,6 +386,46 @@ install_serpl() {
     print_success "serpl installed with AST Grep support"
 }
 
+# Install Zed (code editor)
+install_zed() {
+    print_step "Installing and configuring Zed..."
+
+    if ! command -v zed &> /dev/null; then
+        print_info "Installing Zed via official Linux installer..."
+        curl -f https://zed.dev/install.sh | sh
+        print_success "Zed installed"
+    else
+        print_success "Zed already installed"
+    fi
+
+    local zed_backup_dir="${backup_dir:-$HOME/.zed_config_backup_$(date +%Y%m%d_%H%M%S)}"
+    mkdir -p "$HOME/.config/zed/themes" "$zed_backup_dir"
+
+    if [[ -f "$HOME/.config/zed/settings.json" ]]; then
+        cp "$HOME/.config/zed/settings.json" "$zed_backup_dir/settings.json" 2>/dev/null || true
+    fi
+
+    if [[ -f "$HOME/.config/zed/keymap.json" ]]; then
+        cp "$HOME/.config/zed/keymap.json" "$zed_backup_dir/keymap.json" 2>/dev/null || true
+    fi
+
+    if [[ -f "$HOME/.config/zed/tasks.json" ]]; then
+        cp "$HOME/.config/zed/tasks.json" "$zed_backup_dir/tasks.json" 2>/dev/null || true
+    fi
+
+    if [[ -f "$HOME/.config/zed/themes/islands-dark.json" ]]; then
+        cp "$HOME/.config/zed/themes/islands-dark.json" "$zed_backup_dir/islands-dark.json" 2>/dev/null || true
+    fi
+
+    cp "zed/settings.json" "$HOME/.config/zed/settings.json"
+    cp "zed/keymap.json" "$HOME/.config/zed/keymap.json"
+    cp "zed/tasks.json" "$HOME/.config/zed/tasks.json"
+    cp "zed/themes/islands-dark.json" "$HOME/.config/zed/themes/islands-dark.json"
+
+    print_success "Zed installed and configured"
+    print_warning "Install Zed extensions manually: Groovy, Bookmark language server"
+}
+
 # Final verification
 verify_installation() {
     print_step "Verifying installation..."
@@ -471,6 +511,20 @@ verify_installation() {
     else
         print_warning "ast-grep: Not found (part of serpl installation)"
     fi
+
+    # Check Zed
+    if command -v zed &> /dev/null; then
+        print_success "Zed: Installed"
+    else
+        print_warning "Zed: Not found (may need to restart terminal for PATH update)"
+    fi
+
+    # Check Zed configuration
+    if [[ -f "$HOME/.config/zed/settings.json" ]]; then
+        print_success "Zed config: Applied"
+    else
+        print_warning "Zed config: Not found"
+    fi
 }
 
 # Main installation function
@@ -489,6 +543,7 @@ main() {
     install_additional_packages
     install_lazygit
     install_serpl
+    install_zed
     copy_configurations
     set_default_shell
     verify_installation

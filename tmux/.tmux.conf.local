@@ -167,7 +167,7 @@ tmux_conf_theme_message_command_attr="bold"
 
 # window modes style (copy-mode / selection when reloading full ~/.tmux.conf)
 tmux_conf_theme_mode_fg="#CED0D6"
-tmux_conf_theme_mode_bg="#35538F"
+tmux_conf_theme_mode_bg="#373b39"
 tmux_conf_theme_mode_attr="bold"
 
 # status line style
@@ -367,7 +367,7 @@ tmux_conf_theme_clock_colour="$tmux_conf_theme_colour_4"
 tmux_conf_theme_clock_style="24"
 
 # selection visibility (copy-mode + mouse)
-set -g mode-style "fg=#CED0D6,bg=#35538F"
+set -g mode-style "fg=#CED0D6,bg=#373b39"
 
 
 # -- clipboard -----------------------------------------------------------------
@@ -416,6 +416,10 @@ bind h select-pane -L  #!important
 bind j select-pane -U  #!important
 bind k select-pane -D  #!important
 bind l select-pane -R  #!important
+
+# pane borders
+set -g pane-border-lines double  #!important
+set -g popup-border-lines rounded  #!important
 
 # custom pane resizing (J=up, K=down)
 bind -r H resize-pane -L 5  #!important
