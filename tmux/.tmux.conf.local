@@ -85,24 +85,24 @@ tmux_conf_24b_colour=auto
 #   - tmux_conf_theme_synchronized
 tmux_conf_theme=enabled
 
-# Islands Dark (PyCharm) theme
-tmux_conf_theme_colour_1="#191A1C"    # base (background)
-tmux_conf_theme_colour_2="#2B2D30"    # overlay
-tmux_conf_theme_colour_3="#6F737A"    # muted
-tmux_conf_theme_colour_4="#56A8F5"    # blue
-tmux_conf_theme_colour_5="#D5B778"    # gold
-tmux_conf_theme_colour_6="#191A1C"    # base
-tmux_conf_theme_colour_7="#BCBEC4"    # text
-tmux_conf_theme_colour_8="#191A1C"    # base
-tmux_conf_theme_colour_9="#CF8E6D"    # amber
-tmux_conf_theme_colour_10="#F75464"   # red
-tmux_conf_theme_colour_11="#2AACB8"   # cyan
-tmux_conf_theme_colour_12="#7A7E85"   # subtle
-tmux_conf_theme_colour_13="#CED0D6"   # bright text
-tmux_conf_theme_colour_14="#191A1C"   # base
-tmux_conf_theme_colour_15="#1F2024"   # surface
-tmux_conf_theme_colour_16="#C77DBB"   # magenta
-tmux_conf_theme_colour_17="#BCBEC4"   # text
+# Islands Dark bg + Catppuccin Mocha accents
+tmux_conf_theme_colour_1="#191A1C"    # base (background)          — keep gray
+tmux_conf_theme_colour_2="#2B2D30"    # overlay (pane borders)     — keep gray
+tmux_conf_theme_colour_3="#6F737A"    # muted text                 — keep gray
+tmux_conf_theme_colour_4="#89b4fa"    # catppuccin blue            — active pane border + active window tab bg
+tmux_conf_theme_colour_5="#cba6f7"    # catppuccin mauve           — message/copy-mode highlight bg
+tmux_conf_theme_colour_6="#191A1C"    # dark text on left-seg-1    — left status fg seg 1
+tmux_conf_theme_colour_7="#1e1e2e"    # dark text on left-seg-2    — left status fg seg 2
+tmux_conf_theme_colour_8="#191A1C"    # dark text on left-seg-3    — left status fg seg 3
+tmux_conf_theme_colour_9="#cba6f7"    # catppuccin mauve           — left status bg seg 1 (session name)
+tmux_conf_theme_colour_10="#89b4fa"   # catppuccin blue            — left status bg seg 2 (uptime)
+tmux_conf_theme_colour_11="#a6e3a1"   # catppuccin green           — left status bg seg 3
+tmux_conf_theme_colour_12="#7A7E85"   # subtle                     — keep gray
+tmux_conf_theme_colour_13="#CED0D6"   # bright text                — keep gray
+tmux_conf_theme_colour_14="#000000"   # pure black                 — username/hostname fg
+tmux_conf_theme_colour_15="#1F2024"   # surface                    — keep gray
+tmux_conf_theme_colour_16="#f38ba8"   # catppuccin red             — right status bg seg 3 + sync-pane border
+tmux_conf_theme_colour_17="#BCBEC4"   # text                       — keep gray
 
 # default theme (ansi)
 #tmux_conf_theme_colour_1="colour0"
@@ -197,12 +197,12 @@ tmux_conf_theme_terminal_title="#h ❐ #S ● #I #W"
 #     - #{hostname_full_ssh}
 #     - #{username}
 #     - #{username_ssh}
-tmux_conf_theme_window_status_fg="$tmux_conf_theme_colour_3"
-tmux_conf_theme_window_status_bg="$tmux_conf_theme_colour_1"
+tmux_conf_theme_window_status_fg="default"
+tmux_conf_theme_window_status_bg="#191A1C"
 tmux_conf_theme_window_status_attr="none"
 #tmux_conf_theme_window_status_format="#I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,!,}#{?window_zoomed_flag,Z,}"
 #tmux_conf_theme_window_status_format="#{circled_window_index} #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,!,}#{?window_zoomed_flag,Z,}"
-tmux_conf_theme_window_status_format="#I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,}"
+tmux_conf_theme_window_status_format="#[fg=#3B3F45,bg=#191A1C,none]#[fg=#BCBEC4,bg=#3B3F45] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#3B3F45,bg=#191A1C]"
 
 # window current status style
 #   - built-in variables are:
@@ -214,12 +214,12 @@ tmux_conf_theme_window_status_format="#I #W#{?#{||:#{window_bell_flag},#{window_
 #     - #{hostname_full_ssh}
 #     - #{username}
 #     - #{username_ssh}
-tmux_conf_theme_window_status_current_fg="$tmux_conf_theme_colour_1"
-tmux_conf_theme_window_status_current_bg="$tmux_conf_theme_colour_4"
+tmux_conf_theme_window_status_current_fg="default"
+tmux_conf_theme_window_status_current_bg="#191A1C"
 tmux_conf_theme_window_status_current_attr="bold"
 #tmux_conf_theme_window_status_current_format="#I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,!,}#{?window_zoomed_flag,Z,}"
 #tmux_conf_theme_window_status_current_format="#{circled_window_index} #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,!,}#{?window_zoomed_flag,Z,}"
-tmux_conf_theme_window_status_current_format="#I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,}"
+tmux_conf_theme_window_status_current_format="#[fg=#89b4fa,bg=#191A1C,none]#[fg=#191A1C,bg=#89b4fa,bold] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#89b4fa,bg=#191A1C]"
 
 # window activity status style
 tmux_conf_theme_window_status_activity_fg="default"
@@ -283,7 +283,7 @@ tmux_conf_theme_status_left_bg="$tmux_conf_theme_colour_9,$tmux_conf_theme_colou
 tmux_conf_theme_status_left_attr="bold,none,none"
 
 # status right style
-tmux_conf_theme_status_right_fg="$tmux_conf_theme_colour_12,$tmux_conf_theme_colour_13,$tmux_conf_theme_colour_14"
+tmux_conf_theme_status_right_fg="$tmux_conf_theme_colour_12,$tmux_conf_theme_colour_14,$tmux_conf_theme_colour_14"
 tmux_conf_theme_status_right_bg="$tmux_conf_theme_colour_15,$tmux_conf_theme_colour_16,$tmux_conf_theme_colour_17"
 tmux_conf_theme_status_right_attr="none,none,bold"
 
@@ -333,7 +333,7 @@ tmux_conf_battery_bar_length="auto"
 #   - heat
 #   - "colour_full_fg,colour_empty_fg,colour_bg"
 #   - gradient(colour_fg_1,colour_fg_2,...,colour_fg_n)
-tmux_conf_battery_bar_palette="gradient"
+tmux_conf_battery_bar_palette="gradient(#f38ba8,#fab387,#f9e2af,#a6e3a1)"
 #tmux_conf_battery_bar_palette="#d70000,#e4e4e4,#000000"   # red, white, black
 #tmux_conf_battery_bar_palette="gradient(#00afff,#47a2ff,#7c91ff,#ac7afb,#d65be2,#e163df,#eb6cdd,#f475db,#ec9ff1,#eac3fe,#efe2ff,#ffffff)"
 
@@ -342,7 +342,7 @@ tmux_conf_battery_bar_palette="gradient"
 #   - heat
 #   - "colour_low,colour_half,colour_full"
 #   - gradient(colour_fg_1,colour_fg_2,...,colour_fg_n)
-tmux_conf_battery_hbar_palette="gradient"
+tmux_conf_battery_hbar_palette="gradient(#f38ba8,#fab387,#f9e2af,#a6e3a1)"
 #tmux_conf_battery_hbar_palette="#d70000,#ff5f00,#5fff00"  # red, orange, green
 #tmux_conf_battery_hbar_palette="gradient(#00afff,#47a2ff,#7c91ff,#ac7afb,#d65be2,#e163df,#eb6cdd,#f475db,#ec9ff1,#eac3fe,#efe2ff,#ffffff)"
 
@@ -351,7 +351,7 @@ tmux_conf_battery_hbar_palette="gradient"
 #   - heat
 #   - "colour_low,colour_half,colour_full"
 #   - gradient(colour_fg_1,colour_fg_2,...,colour_fg_n)
-tmux_conf_battery_vbar_palette="gradient"
+tmux_conf_battery_vbar_palette="gradient(#f38ba8,#fab387,#f9e2af,#a6e3a1)"
 #tmux_conf_battery_vbar_palette="#d70000,#ff5f00,#5fff00"  # red, orange, green
 #tmux_conf_battery_vbar_palette="gradient(#00afff,#47a2ff,#7c91ff,#ac7afb,#d65be2,#e163df,#eb6cdd,#f475db,#ec9ff1,#eac3fe,#efe2ff,#ffffff)"
 
@@ -493,6 +493,30 @@ tmux_conf_uninstall_plugins_on_reload=true
 #set -g @plugin 'tmux-plugins/tmux-continuum'
 #set -g @continuum-restore 'on'
 
+
+# -- post-apply overrides ------------------------------------------------------
+# oh-my-tmux's _apply_configuration wraps window-status-format with its own
+# separators and a $spacer conditional (window_last_flag) that adds unwanted
+# spacing artifacts. We override formats via hooks that fire after _apply_configuration.
+#
+# Covered cases:
+#   1. session-created  → fresh tmux start / new session
+#   2. client-attached  → tmux attach (covers detach/reattach)
+#   3. bind r override  → prefix+r config reload (waits for _apply_configuration in bg)
+
+set-hook -g session-created \
+  'setw -g window-status-separator " " ; \
+   setw -g window-status-format "#[fg=#3B3F45,bg=#191A1C,none]\ue0b6#[fg=#BCBEC4,bg=#3B3F45] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#3B3F45,bg=#191A1C]\ue0b4" ; \
+   setw -g window-status-current-format "#[fg=#89b4fa,bg=#191A1C,none]\ue0b6#[fg=#191A1C,bg=#89b4fa,bold] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#89b4fa,bg=#191A1C]\ue0b4"'
+
+set-hook -g client-attached \
+  'setw -g window-status-separator " " ; \
+   setw -g window-status-format "#[fg=#3B3F45,bg=#191A1C,none]\ue0b6#[fg=#BCBEC4,bg=#3B3F45] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#3B3F45,bg=#191A1C]\ue0b4" ; \
+   setw -g window-status-current-format "#[fg=#89b4fa,bg=#191A1C,none]\ue0b6#[fg=#191A1C,bg=#89b4fa,bold] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#89b4fa,bg=#191A1C]\ue0b4"'
+
+# Override prefix+r: source config, then wait for _apply_configuration and reapply
+# tab formats by calling a helper script (avoids quoting nightmares in bind).
+bind r run-shell -b "sh -c '\"\$TMUX_PROGRAM\" \${TMUX_SOCKET:+-S \"\$TMUX_SOCKET\"} source \"\$TMUX_CONF\" ; sleep 4 ; \"\$TMUX_PROGRAM\" \${TMUX_SOCKET:+-S \"\$TMUX_SOCKET\"} source \"$HOME/.tmux-tab-style.conf\" ; \"\$TMUX_PROGRAM\" \${TMUX_SOCKET:+-S \"\$TMUX_SOCKET\"} display \"#{TMUX_CONF} sourced\"'"
 
 # -- custom variables ----------------------------------------------------------
 

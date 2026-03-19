@@ -60,6 +60,9 @@ ln -s -f ~/.tmux/.tmux.conf ~/.tmux.conf
 
 # Copy local configuration
 cp .tmux.conf.local ~/.tmux.conf.local
+
+# Copy tab style overrides (required for rounded pill-style tabs)
+cp .tmux-tab-style.conf ~/.tmux-tab-style.conf
 ```
 
 ### Configuration Features

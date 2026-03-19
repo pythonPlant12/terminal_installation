@@ -38,8 +38,8 @@
 
       "space c a": "editor::ToggleCodeActions",
       "space c f": "editor::Format",
-      "space c e": "editor::Format",
-      "space r v": "editor::Rename",
+      "space c e": ["task::Spawn", { "task_name": "ESLint: Fix Current File" }],
+        "space v r": "editor::Rename",
 
       "space f p": "editor::CopyRelativePath",
       "space f shift-p": "editor::CopyPath",
@@ -65,6 +65,10 @@
       "ctrl-g f b": "editor::ToggleGitBlame",
       "ctrl-g f r": ["git::RestoreFile", { "skip_prompt": false }],
       "ctrl-g w d": "git::Diff",
+      "ctrl-g p": "git::Pull",
+      "ctrl-g shift-p": "git::Push",
+      "ctrl-g f h": "git::FileHistory",
+      "ctrl-g d": "git::Diff",
 
       "cmd-subtract": "editor::FoldAll",
       "cmd-shift-subtract": "editor::UnfoldAll",
@@ -88,11 +92,16 @@
       "shift-w": "vim::EndOfLine",
       "shift-b": "vim::FirstNonWhitespace",
 
+      "shift-s": "vim::PushAddSurrounds",
+
       "ctrl-shift-up": "editor::MoveLineUp",
       "ctrl-shift-down": "editor::MoveLineDown",
 
       "ctrl-j": "pane::ActivatePreviousItem",
-      "ctrl-k": "pane::ActivateNextItem"
+      "ctrl-k": "pane::ActivateNextItem",
+
+      "tab": "editor::Indent",
+      "shift-tab": "editor::Outdent"
     }
   },
   {
@@ -153,8 +162,12 @@
 
       "cmd-shift-i": "editor::Format",
 
-      "cmd-shift-=": "zed::IncreaseBufferFontSize",
-      "cmd-minus": "zed::DecreaseBufferFontSize"
+       "cmd-shift-=": "zed::IncreaseBufferFontSize",
+       "cmd-minus": "zed::DecreaseBufferFontSize",
+
+       "cmd-shift-r": ["pane::DeploySearch", { "replace_enabled": true }],
+       "cmd-r": "buffer_search::DeployReplace",
+       "cmd-6": "task::Spawn"
     }
   }
 ]

@@ -270,6 +270,11 @@ copy_configurations() {
         print_info "Copying Tmux configuration..."
         cp "tmux/.tmux.conf.local" "$HOME/.tmux.conf.local"
     fi
+
+    if [[ -f "tmux/.tmux-tab-style.conf" ]]; then
+        print_info "Copying Tmux tab style configuration..."
+        cp "tmux/.tmux-tab-style.conf" "$HOME/.tmux-tab-style.conf"
+    fi
     
     print_success "Configurations copied (backups in $backup_dir)"
 }
