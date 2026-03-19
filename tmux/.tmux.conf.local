@@ -94,8 +94,8 @@ tmux_conf_theme_colour_5="#cba6f7"    # catppuccin mauve           — message/c
 tmux_conf_theme_colour_6="#191A1C"    # dark text on left-seg-1    — left status fg seg 1
 tmux_conf_theme_colour_7="#1e1e2e"    # dark text on left-seg-2    — left status fg seg 2
 tmux_conf_theme_colour_8="#191A1C"    # dark text on left-seg-3    — left status fg seg 3
-tmux_conf_theme_colour_9="#cba6f7"    # catppuccin mauve           — left status bg seg 1 (session name)
-tmux_conf_theme_colour_10="#89b4fa"   # catppuccin blue            — left status bg seg 2 (uptime)
+tmux_conf_theme_colour_9="#89b4fa"    # catppuccin blue            — left status bg seg 1 (session name)
+tmux_conf_theme_colour_10="#cba6f7"   # catppuccin mauve           — left status bg seg 2 (uptime)
 tmux_conf_theme_colour_11="#a6e3a1"   # catppuccin green           — left status bg seg 3
 tmux_conf_theme_colour_12="#7A7E85"   # subtle                     — keep gray
 tmux_conf_theme_colour_13="#CED0D6"   # bright text                — keep gray
@@ -219,7 +219,7 @@ tmux_conf_theme_window_status_current_bg="#191A1C"
 tmux_conf_theme_window_status_current_attr="bold"
 #tmux_conf_theme_window_status_current_format="#I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,!,}#{?window_zoomed_flag,Z,}"
 #tmux_conf_theme_window_status_current_format="#{circled_window_index} #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,!,}#{?window_zoomed_flag,Z,}"
-tmux_conf_theme_window_status_current_format="#[fg=#89b4fa,bg=#191A1C,none]#[fg=#191A1C,bg=#89b4fa,bold] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#89b4fa,bg=#191A1C]"
+tmux_conf_theme_window_status_current_format="#[fg=#cba6f7,bg=#191A1C,none]#[fg=#191A1C,bg=#cba6f7,bold] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#cba6f7,bg=#191A1C]"
 
 # window activity status style
 tmux_conf_theme_window_status_activity_fg="default"
@@ -507,12 +507,12 @@ tmux_conf_uninstall_plugins_on_reload=true
 set-hook -g session-created \
   'setw -g window-status-separator " " ; \
    setw -g window-status-format "#[fg=#3B3F45,bg=#191A1C,none]\ue0b6#[fg=#BCBEC4,bg=#3B3F45] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#3B3F45,bg=#191A1C]\ue0b4" ; \
-   setw -g window-status-current-format "#[fg=#89b4fa,bg=#191A1C,none]\ue0b6#[fg=#191A1C,bg=#89b4fa,bold] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#89b4fa,bg=#191A1C]\ue0b4"'
+   setw -g window-status-current-format "#[fg=#cba6f7,bg=#191A1C,none]\ue0b6#[fg=#191A1C,bg=#cba6f7,bold] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#cba6f7,bg=#191A1C]\ue0b4"'
 
 set-hook -g client-attached \
   'setw -g window-status-separator " " ; \
    setw -g window-status-format "#[fg=#3B3F45,bg=#191A1C,none]\ue0b6#[fg=#BCBEC4,bg=#3B3F45] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#3B3F45,bg=#191A1C]\ue0b4" ; \
-   setw -g window-status-current-format "#[fg=#89b4fa,bg=#191A1C,none]\ue0b6#[fg=#191A1C,bg=#89b4fa,bold] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#89b4fa,bg=#191A1C]\ue0b4"'
+   setw -g window-status-current-format "#[fg=#cba6f7,bg=#191A1C,none]\ue0b6#[fg=#191A1C,bg=#cba6f7,bold] #I #W#{?#{||:#{window_bell_flag},#{window_zoomed_flag}}, ,}#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,} #[fg=#cba6f7,bg=#191A1C]\ue0b4"'
 
 # Override prefix+r: source config, then wait for _apply_configuration and reapply
 # tab formats by calling a helper script (avoids quoting nightmares in bind).
