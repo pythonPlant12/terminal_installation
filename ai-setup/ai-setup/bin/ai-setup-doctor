@@ -1,0 +1,434 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+SCRIPT_PATH="${0:A}"
+ROOT_DIR="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
+source "$ROOT_DIR/scripts/lib.zsh"
+source "$ROOT_DIR/scripts/helpers/keychain-helpers.zsh"
+source "$ROOT_DIR/scripts/helpers/health-check.zsh"
+
+# usage() - Print usage information
+usage() {
+  cat <<EOF
+ai-setup-doctor — Check AI tool integration health
+
+USAGE:
+  ai-setup-doctor              Show human-readable health report (default)
+  ai-setup-doctor --status     Show human-readable health report
+  ai-setup-doctor --json       Show structured JSON output for scripting
+
+EXAMPLES:
+  ai-setup-doctor
+  ai-setup-doctor --json | jq .
+
+EOF
+}
+
+# verify_atlassian_auth()
+# Check Atlassian credential validity.
+# Returns 0 if valid, 1 if missing/invalid
+verify_atlassian_auth() {
+  local keychain_url keychain_email keychain_token
+
+  # Retrieve credentials from Keychain
+  keychain_url=$(retrieve_from_keychain "opencode-atlassian-url" || echo "")
+  keychain_email=$(retrieve_from_keychain "opencode-atlassian-email" || echo "")
+  keychain_token=$(retrieve_from_keychain "opencode-atlassian-token" || echo "")
+
+  # If any credential is missing, return 1
+  if [[ -z "$keychain_url" ]] || [[ -z "$keychain_email" ]] || [[ -z "$keychain_token" ]]; then
+    return 1
+  fi
+
+  # Validate token against Jira API
+  if validate_atlassian_token "$keychain_url" "$keychain_email" "$keychain_token"; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# verify_opencode_installed()
+# Check OpenCode CLI availability.
+# Returns 0 if found, 1 otherwise
+verify_opencode_installed() {
+  if check_tool_available "opencode"; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+verify_recovery_cli_available() {
+  local -a commands=(
+    "ai-setup-export"
+    "ai-setup-import"
+    "ai-setup-rollback"
+    "ai-setup-snapshot"
+  )
+
+  local command_name
+  for command_name in "${commands[@]}"; do
+    if ! check_tool_available_or_linked "$command_name"; then
+      return 1
+    fi
+  done
+
+  return 0
+}
+
+# format_status_human()
+# Print human-readable health report
+format_status_human() {
+  local path_has_local_bin=true
+  if [[ ":${PATH}:" != *":${HOME}/.local/bin:"* ]]; then
+    path_has_local_bin=false
+  fi
+
+  local atlassian_available atlassian_auth
+  local opencode_available
+  local recovery_disabled recovery_available
+  local docker_available
+  local learnings_rule_ok
+  local gsd_patched_ok
+
+  # Check Atlassian
+  atlassian_available=0
+  atlassian_auth=0
+  if verify_atlassian_auth; then
+    atlassian_auth=0
+  else
+    atlassian_auth=1
+  fi
+
+  # Check OpenCode
+  if verify_opencode_installed; then
+    opencode_available=0
+  else
+    opencode_available=1
+  fi
+
+  recovery_disabled=0
+  recovery_available=1
+
+  if [[ "${AIRCONSOLE_WITH_RECOVERY_CLI:-1}" != "1" ]]; then
+    recovery_disabled=1
+  elif verify_recovery_cli_available; then
+    recovery_available=0
+  fi
+
+  # Check Docker Desktop (skip in CI — not available in GitHub Actions runners)
+  if [[ "${CI:-}" == "true" ]]; then
+    docker_available="skip"
+  elif command -v docker >/dev/null 2>&1; then
+    docker_available=0
+  else
+    docker_available=1
+  fi
+
+  # Check Learnings Researcher mandate rule
+  if check_learnings_researcher_rule; then
+    learnings_rule_ok=0
+  else
+    learnings_rule_ok=1
+  fi
+
+  # Check GSD workflows patched
+  if check_gsd_workflows_patched; then
+    gsd_patched_ok=0
+  else
+    gsd_patched_ok=1
+  fi
+
+  # Print header
+  print ""
+  print "AI Setup Health Report"
+  print "======================"
+  print ""
+
+  if [[ "$path_has_local_bin" != "true" ]]; then
+    warn "PATH is missing ~/.local/bin; commands like opencode-atlassian-login may show as 'not found'. Add: export PATH=\"$HOME/.local/bin:$PATH\""
+    print ""
+  fi
+
+  # Print each tool status
+  if [[ "$atlassian_available" == "0" && "$atlassian_auth" == "0" ]]; then
+    ok "Atlassian MCP: available, authenticated (credentials valid)"
+  elif [[ "$atlassian_available" == "0" && "$atlassian_auth" == "1" ]]; then
+    if [[ "$path_has_local_bin" == "true" ]]; then
+      warn "Atlassian MCP: available, not authenticated (Run: opencode-atlassian-login)"
+    else
+      warn "Atlassian MCP: available, not authenticated (Run: opencode-atlassian-login; ensure ~/.local/bin is on PATH)"
+    fi
+  else
+    warn "Atlassian MCP: not available"
+  fi
+
+  if [[ "$docker_available" == "skip" ]]; then
+    vlog "Docker Desktop: skipped (CI environment)"
+  elif [[ "$docker_available" == "0" ]]; then
+    ok "Docker Desktop: available (required for Atlassian MCP)"
+  else
+    warn "Docker Desktop: not installed — required for Atlassian MCP (Install: https://www.docker.com/products/docker-desktop/)"
+  fi
+
+  if [[ "$opencode_available" == "0" ]]; then
+    ok "OpenCode CLI: available"
+  else
+    warn "OpenCode CLI: not available"
+  fi
+
+  if [[ "$recovery_disabled" == "1" ]]; then
+    vlog "Recovery CLI: disabled by configuration"
+  elif [[ "$recovery_available" == "0" ]]; then
+    ok "Recovery CLI: available"
+  else
+    if [[ "$path_has_local_bin" == "true" ]]; then
+      warn "Recovery CLI: not available (Re-run bootstrap to relink bin tools)"
+    else
+      warn "Recovery CLI: not available (Ensure ~/.local/bin is on PATH, then re-run bootstrap to relink bin tools)"
+    fi
+  fi
+
+  if [[ "$learnings_rule_ok" == "0" ]]; then
+    ok "Learnings Researcher: mandate rule deployed"
+  else
+    die "Learnings Researcher: mandate rule missing (Re-run bootstrap)"
+  fi
+
+  if [[ "$gsd_patched_ok" == "0" ]]; then
+    ok "GSD Workflows: patched with learnings-researcher"
+  else
+    warn "GSD Workflows: not patched with learnings-researcher (GSD may not be installed)"
+  fi
+
+  # Print summary
+  print ""
+  local ready=0
+  local needs_setup=0
+  local unavailable=0
+  local disabled=0
+
+  if [[ "$atlassian_auth" == "0" ]]; then
+    ready=$((ready + 1))
+  else
+    needs_setup=$((needs_setup + 1))
+  fi
+  if [[ "$docker_available" == "0" ]]; then
+    ready=$((ready + 1))
+  elif [[ "$docker_available" != "skip" ]]; then
+    unavailable=$((unavailable + 1))
+  fi
+  if [[ "$opencode_available" == "0" ]]; then
+    ready=$((ready + 1))
+  else
+    unavailable=$((unavailable + 1))
+  fi
+
+  if [[ "$recovery_disabled" == "1" ]]; then
+    disabled=$((disabled + 1))
+  elif [[ "$recovery_available" == "0" ]]; then
+    ready=$((ready + 1))
+  else
+    unavailable=$((unavailable + 1))
+  fi
+
+  if [[ "$learnings_rule_ok" == "0" ]]; then
+    ready=$((ready + 1))
+  else
+    unavailable=$((unavailable + 1))
+  fi
+
+  if [[ "$gsd_patched_ok" == "0" ]]; then
+    ready=$((ready + 1))
+  else
+    needs_setup=$((needs_setup + 1))
+  fi
+
+  if (( needs_setup == 0 && unavailable == 0 )); then
+    ok "Summary: All tools ready"
+  else
+    warn "Summary: $ready ready, $needs_setup need setup, $unavailable unavailable"
+  fi
+
+  print ""
+}
+
+# format_status_json()
+# Print JSON health report
+format_status_json() {
+  local path_has_local_bin=true
+  if [[ ":${PATH}:" != *":${HOME}/.local/bin:"* ]]; then
+    path_has_local_bin=false
+  fi
+
+  local atlassian_available atlassian_auth
+  local opencode_available
+  local recovery_disabled recovery_available
+  local docker_available
+  local learnings_rule_ok
+  local gsd_patched_ok
+
+  # Check Atlassian
+  atlassian_available=0
+  atlassian_auth=0
+  if verify_atlassian_auth; then
+    atlassian_auth=0
+  else
+    atlassian_auth=1
+  fi
+
+  # Check OpenCode
+  if verify_opencode_installed; then
+    opencode_available=0
+  else
+    opencode_available=1
+  fi
+
+  recovery_disabled=0
+  recovery_available=1
+
+  if [[ "${AIRCONSOLE_WITH_RECOVERY_CLI:-1}" != "1" ]]; then
+    recovery_disabled=1
+  elif verify_recovery_cli_available; then
+    recovery_available=0
+  fi
+
+  # Check Docker Desktop (skip in CI — not available in GitHub Actions runners)
+  if [[ "${CI:-}" == "true" ]]; then
+    docker_available="skip"
+  elif command -v docker >/dev/null 2>&1; then
+    docker_available=0
+  else
+    docker_available=1
+  fi
+
+  # Check Learnings Researcher mandate rule
+  if check_learnings_researcher_rule; then
+    learnings_rule_ok=0
+  else
+    learnings_rule_ok=1
+  fi
+
+  # Check GSD workflows patched
+  if check_gsd_workflows_patched; then
+    gsd_patched_ok=0
+  else
+    gsd_patched_ok=1
+  fi
+
+  # Calculate counts
+  local ready=0
+  local needs_setup=0
+  local unavailable=0
+  local disabled=0
+
+  if [[ "$atlassian_auth" == "0" ]]; then
+    ready=$((ready + 1))
+  else
+    needs_setup=$((needs_setup + 1))
+  fi
+  if [[ "$docker_available" == "0" ]]; then
+    ready=$((ready + 1))
+  elif [[ "$docker_available" != "skip" ]]; then
+    unavailable=$((unavailable + 1))
+  fi
+  if [[ "$opencode_available" == "0" ]]; then
+    ready=$((ready + 1))
+  else
+    unavailable=$((unavailable + 1))
+  fi
+
+  if [[ "$recovery_disabled" == "1" ]]; then
+    disabled=$((disabled + 1))
+  elif [[ "$recovery_available" == "0" ]]; then
+    ready=$((ready + 1))
+  else
+    unavailable=$((unavailable + 1))
+  fi
+
+  if [[ "$learnings_rule_ok" == "0" ]]; then
+    ready=$((ready + 1))
+  else
+    unavailable=$((unavailable + 1))
+  fi
+
+  if [[ "$gsd_patched_ok" == "0" ]]; then
+    ready=$((ready + 1))
+  else
+    needs_setup=$((needs_setup + 1))
+  fi
+
+  local total=$((ready + needs_setup + unavailable + disabled))
+
+  cat <<EOF
+{
+  "tools": {
+    "atlassian": {
+      "available": $([ "$atlassian_available" = "0" ] && echo "true" || echo "false"),
+      "authenticated": $([ "$atlassian_auth" = "0" ] && echo "true" || echo "false"),
+      "status": "$([ "$atlassian_auth" = "0" ] && echo "ready" || echo "needs_setup")",
+      "guidance": "$([ "$atlassian_auth" = "0" ] && echo "" || ( [ "$path_has_local_bin" = "true" ] && echo "Run: opencode-atlassian-login" || echo "Ensure ~/.local/bin is on PATH; then run: opencode-atlassian-login" ))"
+    },
+    "docker": {
+      "available": $([ "$docker_available" = "0" ] && echo "true" || echo "false"),
+      "status": "$([ "$docker_available" = "0" ] && echo "ready" || ([ "$docker_available" = "skip" ] && echo "skipped" || echo "unavailable"))",
+      "guidance": "$([ "$docker_available" = "1" ] && echo "Install Docker Desktop: https://www.docker.com/products/docker-desktop/" || echo "")"
+    },
+    "opencode": {
+      "available": $([ "$opencode_available" = "0" ] && echo "true" || echo "false"),
+      "authenticated": true,
+      "status": "$([ "$opencode_available" = "0" ] && echo "ready" || echo "unavailable")",
+      "guidance": "$([ "$opencode_available" = "1" ] && echo "Re-run bootstrap" || echo "")"
+    },
+    "recovery_cli": {
+      "available": $([ "$recovery_available" = "0" ] && echo "true" || echo "false"),
+      "authenticated": true,
+      "status": "$([ "$recovery_disabled" = "1" ] && echo "disabled" || ([ "$recovery_available" = "0" ] && echo "ready" || echo "unavailable"))",
+      "guidance": "$([ "$recovery_disabled" = "1" ] && echo "Disabled by configuration" || ([ "$recovery_available" = "0" ] && echo "" || ( [ "$path_has_local_bin" = "true" ] && echo "Re-run bootstrap to relink bin tools" || echo "Ensure ~/.local/bin is on PATH; then re-run bootstrap to relink bin tools" )))"
+    },
+    "learnings_researcher_rule": {
+      "available": $([ "$learnings_rule_ok" = "0" ] && echo "true" || echo "false"),
+      "status": "$([ "$learnings_rule_ok" = "0" ] && echo "ready" || echo "unavailable")",
+      "guidance": "$([ "$learnings_rule_ok" = "1" ] && echo "Re-run bootstrap" || echo "")"
+    },
+    "gsd_workflows_patched": {
+      "available": $([ "$gsd_patched_ok" = "0" ] && echo "true" || echo "false"),
+      "status": "$([ "$gsd_patched_ok" = "0" ] && echo "ready" || echo "needs_setup")",
+      "guidance": "$([ "$gsd_patched_ok" = "1" ] && echo "GSD may not be installed" || echo "")"
+    }
+  },
+  "summary": {
+    "ready": $ready,
+    "needs_setup": $needs_setup,
+    "unavailable": $unavailable,
+    "disabled": $disabled,
+    "total": $total
+  }
+}
+EOF
+}
+
+# Main
+main() {
+  local mode="${1:-status}"
+
+  case "$mode" in
+    --help | -h | help)
+      usage
+      exit 0
+      ;;
+    --status | status)
+      format_status_human
+      ;;
+    --json | json)
+      format_status_json
+      ;;
+    *)
+      usage
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

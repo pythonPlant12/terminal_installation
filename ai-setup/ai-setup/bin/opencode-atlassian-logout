@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SERVICE_PREFIX="opencode-atlassian"
+ACCOUNT="${USER}"
+
+delete_item() {
+	local service="$1"
+	if security find-generic-password -s "$service" -a "$ACCOUNT" >/dev/null 2>&1; then
+		security delete-generic-password -s "$service" -a "$ACCOUNT" >/dev/null
+		echo "✅ Deleted Keychain item: $service"
+	else
+		echo "ℹ️  Not found in Keychain: $service"
+	fi
+}
+
+echo "This will remove Atlassian MCP credentials from macOS Keychain for user: $ACCOUNT"
+read -r -p "Continue? (y/N): " yn
+[[ "${yn}" == "y" || "${yn}" == "Y" ]] || {
+	echo "Aborted."
+	exit 0
+}
+
+delete_item "${SERVICE_PREFIX}-url"
+delete_item "${SERVICE_PREFIX}-email"
+delete_item "${SERVICE_PREFIX}-token"
+
+echo
+echo "Optional but recommended:"
+echo "  Revoke the token in Atlassian as well:"
+echo "  https://id.atlassian.com/manage-profile/security/api-tokens"

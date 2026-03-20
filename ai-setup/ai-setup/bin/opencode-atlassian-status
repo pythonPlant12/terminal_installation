@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SERVICE_PREFIX="opencode-atlassian"
+ACCOUNT="${USER}"
+
+URL="$(security find-generic-password -s "${SERVICE_PREFIX}-url" -a "$ACCOUNT" -w 2>/dev/null || true)"
+EMAIL="$(security find-generic-password -s "${SERVICE_PREFIX}-email" -a "$ACCOUNT" -w 2>/dev/null || true)"
+TOKEN="$(security find-generic-password -s "${SERVICE_PREFIX}-token" -a "$ACCOUNT" -w 2>/dev/null || true)"
+
+if [[ -z "$URL" || -z "$EMAIL" || -z "$TOKEN" ]]; then
+  echo "missing"
+  exit 1
+fi
+
+# Quick validation (optional)
+if command -v curl >/dev/null 2>&1; then
+  code="$(curl -s -o /dev/null -w "%{http_code}" -u "${EMAIL}:${TOKEN}" "${URL}/rest/api/3/myself" || true)"
+  if [[ "$code" != "200" ]]; then
+    echo "present-but-invalid (HTTP $code)"
+    exit 2
+  fi
+fi
+
+echo "ok"

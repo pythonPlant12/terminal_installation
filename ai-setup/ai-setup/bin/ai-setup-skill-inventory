@@ -1,0 +1,440 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+SCRIPT_PATH="${0:A}"
+ROOT_DIR="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
+source "$ROOT_DIR/scripts/lib.zsh"
+
+SKILLS_DIR="$ROOT_DIR/opencode/skills"
+OUTPUT_FILE="$SKILLS_DIR/skill-inventory.md"
+
+usage() {
+  cat <<EOF
+ai-setup-skill-inventory — Scan SKILL.md files and generate a skill inventory
+
+USAGE:
+  ai-setup-skill-inventory [COMMAND]
+
+COMMANDS:
+  --generate       Scan SKILL.md files and generate skill-inventory.md (default)
+  --json           Output skill inventory as JSON to stdout
+  --check          Validate all SKILL.md files have required frontmatter fields
+  --help, -h       Show this help
+
+EXAMPLES:
+  ai-setup-skill-inventory                    # Generate inventory markdown
+  ai-setup-skill-inventory --json             # JSON output
+  ai-setup-skill-inventory --json | jq .      # Pretty-print JSON
+  ai-setup-skill-inventory --check            # Validate frontmatter
+
+SCAN PATHS:
+  <repo>/opencode/skills/*/SKILL.md
+  .agents/skills/*/SKILL.md (current working directory)
+EOF
+}
+
+# Parse frontmatter from a SKILL.md file.
+# Extracts simple key: value pairs from the YAML block between --- delimiters.
+# Outputs key=value lines to stdout (one per line).
+# Does NOT handle multi-line values or YAML lists — only simple scalars.
+parse_frontmatter() {
+  local file="$1"
+  awk '
+    /^---[[:space:]]*$/ {
+      if (in_fm) exit
+      in_fm = 1
+      next
+    }
+    in_fm && /^[a-zA-Z][-a-zA-Z_]*:/ {
+      key = $0
+      sub(/:.*/, "", key)
+      val = $0
+      sub(/^[^:]+:[[:space:]]*/, "", val)
+      sub(/[[:space:]]+$/, "", val)
+      print key "=" val
+    }
+  ' "$file"
+}
+
+# Get a specific frontmatter field value from a SKILL.md file.
+# Returns empty string if the field is not found.
+get_field() {
+  local file="$1"
+  local field="$2"
+  local result=""
+  result="$(parse_frontmatter "$file" | grep "^${field}=" 2>/dev/null | head -1 | cut -d= -f2- || true)"
+  printf '%s' "$result"
+}
+
+# Count reference files in a skill directory.
+# Returns the count as a number.
+count_references() {
+  local skill_dir="$1"
+  local ref_dir="${skill_dir}/references"
+  if [[ -d "$ref_dir" ]]; then
+    local count
+    count="$(find "$ref_dir" -maxdepth 1 -name '*.md' -type f 2>/dev/null | wc -l | tr -d ' ')"
+    printf '%s' "$count"
+  else
+    printf '0'
+  fi
+}
+
+# Discover all SKILL.md files across both skill directories.
+# Outputs one path per line, sorted by skill name.
+discover_skills() {
+  local -a skill_files=()
+  local dir skill_file dirname
+
+  if [[ -d "$SKILLS_DIR" ]]; then
+    for dir in "$SKILLS_DIR"/*/; do
+      [[ -d "$dir" ]] || continue
+      skill_file="${dir}SKILL.md"
+      if [[ -f "$skill_file" ]]; then
+        dirname="$(basename "$dir")"
+        [[ "$dirname" == "skill-inventory" ]] && continue
+        skill_files+=("$skill_file")
+      fi
+    done
+  fi
+
+  # Scan CWD .agents/skills if present
+  local agents_dir="${PWD}/.agents/skills"
+  if [[ -d "$agents_dir" ]]; then
+    for dir in "$agents_dir"/*/; do
+      [[ -d "$dir" ]] || continue
+      skill_file="${dir}SKILL.md"
+      if [[ -f "$skill_file" ]]; then
+        skill_files+=("$skill_file")
+      fi
+    done
+  fi
+
+  (( ${#skill_files[@]} == 0 )) && return 0
+  printf '%s\n' "${skill_files[@]}" | sort
+}
+
+# Escape a string for safe inclusion in JSON.
+json_escape() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\t'/\\t}"
+  printf '%s' "$s"
+}
+
+# Truncate a string to fit a markdown table cell (max ~60 chars).
+truncate_cell() {
+  local s="$1"
+  local max="${2:-60}"
+  if (( ${#s} > max )); then
+    printf '%s...' "${s:0:$((max - 3))}"
+  else
+    printf '%s' "$s"
+  fi
+}
+
+cmd_generate() {
+  local -a skill_files=()
+  local line
+  while IFS= read -r line; do
+    [[ -n "$line" ]] || continue
+    skill_files+=("$line")
+  done < <(discover_skills)
+
+  local total="${#skill_files[@]}"
+  if (( total == 0 )); then
+    warn "No SKILL.md files found in $SKILLS_DIR or CWD .agents/skills/"
+    return 1
+  fi
+
+  log "Scanning $total SKILL.md files..."
+
+  # Collect all skill data into parallel arrays for multi-pass output
+  local -a all_names=()
+  local -a all_descriptions=()
+  local -a all_inputs=()
+  local -a all_outputs=()
+  local -a all_categories=()
+  local -a all_invocations=()
+  local -a all_ref_counts=()
+  local -a all_locations=()
+
+  typeset -A category_set
+
+  local file skill_dir name category input_field output_field description manual_only ref_count location invocation
+  for file in "${skill_files[@]}"; do
+    skill_dir="$(dirname "$file")"
+
+    name="$(get_field "$file" "name")"
+    category="$(get_field "$file" "category")"
+    input_field="$(get_field "$file" "input")"
+    output_field="$(get_field "$file" "output")"
+    description="$(get_field "$file" "description")"
+    manual_only="$(get_field "$file" "disable-model-invocation")"
+    ref_count="$(count_references "$skill_dir")"
+
+    [[ -z "$name" ]] && name="$(basename "$skill_dir")"
+    [[ -z "$category" ]] && category="uncategorized"
+    [[ -z "$input_field" ]] && input_field="(not specified)"
+    [[ -z "$output_field" ]] && output_field="(not specified)"
+    [[ -z "$description" ]] && description="(no description)"
+
+    invocation="auto"
+    [[ "$manual_only" == "true" ]] && invocation="manual"
+
+    # Shorten location for display
+    location="${skill_dir/#$HOME/~}"
+
+    all_names+=("$name")
+    all_descriptions+=("$description")
+    all_inputs+=("$input_field")
+    all_outputs+=("$output_field")
+    all_categories+=("$category")
+    all_invocations+=("$invocation")
+    all_ref_counts+=("$ref_count")
+    all_locations+=("$location")
+
+    category_set[$category]=1
+  done
+
+  # Sorted unique categories
+  local -a sorted_categories=()
+  sorted_categories=($(printf '%s\n' "${(k)category_set[@]}" | sort))
+  local cat_count="${#sorted_categories[@]}"
+
+  local timestamp
+  timestamp="$(date -u +%Y-%m-%dT%H:%M:%S)"
+
+  ensure_dir "$(dirname "$OUTPUT_FILE")"
+
+  {
+    print -r -- "# Skill Inventory"
+    print -r -- ""
+    print -r -- "> Auto-generated by \`ai-setup-skill-inventory\`. Do not edit manually."
+    print -r -- "> Generated: $timestamp"
+    print -r -- "> Total skills: $total | Categories: $cat_count"
+    print -r -- ""
+    print -r -- "## Categories"
+    print -r -- ""
+
+    local cat i pair idx desc_trunc input_trunc output_trunc ref_label
+    local -a cat_indices sorted_pairs all_pairs
+
+    for cat in "${sorted_categories[@]}"; do
+      print -r -- "### $cat"
+      print -r -- ""
+      print -r -- "| Skill | Description | Input | Output |"
+      print -r -- "|-------|-------------|-------|--------|"
+
+      # Collect indices for this category, sorted by name
+      cat_indices=()
+      for (( i = 1; i <= total; i++ )); do
+        [[ "${all_categories[$i]}" == "$cat" ]] && cat_indices+=("$i")
+      done
+
+      # Sort by name (build name=index pairs, sort, extract index)
+      sorted_pairs=()
+      for i in "${cat_indices[@]}"; do
+        sorted_pairs+=("${all_names[$i]}=$i")
+      done
+      sorted_pairs=($(printf '%s\n' "${sorted_pairs[@]}" | sort))
+
+      for pair in "${sorted_pairs[@]}"; do
+        idx="${pair##*=}"
+        desc_trunc="$(truncate_cell "${all_descriptions[$idx]}" 60)"
+        input_trunc="$(truncate_cell "${all_inputs[$idx]}" 40)"
+        output_trunc="$(truncate_cell "${all_outputs[$idx]}" 40)"
+        print -r -- "| ${all_names[$idx]} | $desc_trunc | $input_trunc | $output_trunc |"
+      done
+      print -r -- ""
+    done
+
+    print -r -- "## All Skills (alphabetical)"
+    print -r -- ""
+    print -r -- "| Skill | Category | Invocation | References |"
+    print -r -- "|-------|----------|------------|------------|"
+
+    # Build name=index pairs for all skills, sort alphabetically
+    all_pairs=()
+    for (( i = 1; i <= total; i++ )); do
+      all_pairs+=("${all_names[$i]}=$i")
+    done
+    all_pairs=($(printf '%s\n' "${all_pairs[@]}" | sort))
+
+    for pair in "${all_pairs[@]}"; do
+      idx="${pair##*=}"
+      ref_label="${all_ref_counts[$idx]} files"
+      (( all_ref_counts[$idx] == 1 )) && ref_label="1 file"
+      (( all_ref_counts[$idx] == 0 )) && ref_label="none"
+      print -r -- "| ${all_names[$idx]} | ${all_categories[$idx]} | ${all_invocations[$idx]} | $ref_label |"
+    done
+    print -r -- ""
+  } > "$OUTPUT_FILE"
+
+  ok "Skill inventory generated: $OUTPUT_FILE ($total skills, $cat_count categories)"
+}
+
+cmd_json() {
+  require_cmd jq
+
+  local -a skill_files=()
+  local line
+  while IFS= read -r line; do
+    [[ -n "$line" ]] || continue
+    skill_files+=("$line")
+  done < <(discover_skills)
+
+  local total="${#skill_files[@]}"
+  if (( total == 0 )); then
+    warn "No SKILL.md files found"
+    print -r -- '{"generated":"","total_skills":0,"categories":[],"skills":[]}'
+    return 1
+  fi
+
+  local timestamp
+  timestamp="$(date -u +%Y-%m-%dT%H:%M:%S)"
+
+  typeset -A category_set
+  local json_skills=""
+  local first=true
+
+  local file skill_dir name category input_field output_field description manual_only_raw ref_count location manual_only
+  for file in "${skill_files[@]}"; do
+    skill_dir="$(dirname "$file")"
+
+    name="$(get_field "$file" "name")"
+    category="$(get_field "$file" "category")"
+    input_field="$(get_field "$file" "input")"
+    output_field="$(get_field "$file" "output")"
+    description="$(get_field "$file" "description")"
+    manual_only_raw="$(get_field "$file" "disable-model-invocation")"
+    ref_count="$(count_references "$skill_dir")"
+
+    [[ -z "$name" ]] && name="$(basename "$skill_dir")"
+    [[ -z "$category" ]] && category="uncategorized"
+
+    manual_only="false"
+    [[ "$manual_only_raw" == "true" ]] && manual_only="true"
+
+    # Shorten location for display
+    location="${skill_dir/#$HOME/~}"
+
+    category_set[$category]=1
+
+    if [[ "$first" == true ]]; then
+      first=false
+    else
+      json_skills+=","
+    fi
+
+    json_skills+="{"
+    json_skills+="\"name\":\"$(json_escape "$name")\","
+    json_skills+="\"description\":\"$(json_escape "$description")\","
+    json_skills+="\"input\":\"$(json_escape "$input_field")\","
+    json_skills+="\"output\":\"$(json_escape "$output_field")\","
+    json_skills+="\"category\":\"$(json_escape "$category")\","
+    json_skills+="\"location\":\"$(json_escape "$location")\","
+    json_skills+="\"manual_only\":${manual_only},"
+    json_skills+="\"reference_count\":${ref_count}"
+    json_skills+="}"
+  done
+
+  # Build sorted categories array
+  local -a sorted_categories=()
+  sorted_categories=($(printf '%s\n' "${(k)category_set[@]}" | sort))
+  local cats_json=""
+  local cat_first=true
+  local cat
+  for cat in "${sorted_categories[@]}"; do
+    if [[ "$cat_first" == true ]]; then
+      cat_first=false
+    else
+      cats_json+=","
+    fi
+    cats_json+="\"$(json_escape "$cat")\""
+  done
+
+  local json="{"
+  json+="\"generated\":\"$timestamp\","
+  json+="\"total_skills\":$total,"
+  json+="\"categories\":[$cats_json],"
+  json+="\"skills\":[$json_skills]"
+  json+="}"
+
+  print -r -- "$json" | jq '.'
+}
+
+cmd_check() {
+  local -a skill_files=()
+  local line
+  while IFS= read -r line; do
+    [[ -n "$line" ]] || continue
+    skill_files+=("$line")
+  done < <(discover_skills)
+
+  local total="${#skill_files[@]}"
+  if (( total == 0 )); then
+    die "No SKILL.md files found in $SKILLS_DIR or CWD .agents/skills/"
+  fi
+
+  local errors=0
+  local checked=0
+  local -a required_fields=(name description input output category)
+
+  log "Checking $total SKILL.md files for required frontmatter..."
+
+  local file skill_name field value
+  local -a missing
+  for file in "${skill_files[@]}"; do
+    checked=$(( checked + 1 ))
+    skill_name="$(basename "$(dirname "$file")")"
+    missing=()
+
+    for field in "${required_fields[@]}"; do
+      value="$(get_field "$file" "$field")"
+      if [[ -z "$value" ]]; then
+        missing+=("$field")
+      fi
+    done
+
+    if (( ${#missing[@]} > 0 )); then
+      print -r -- "❌ $skill_name — missing: ${(j:, :)missing}"
+      errors=$(( errors + 1 ))
+    else
+      print -r -- "✅ $skill_name"
+    fi
+  done
+
+  print -r -- ""
+  if (( errors > 0 )); then
+    die "Frontmatter check failed: $errors of $checked skills have missing fields"
+  fi
+
+  ok "All $checked skills have complete frontmatter (name, description, input, output, category)"
+}
+
+main() {
+  local mode="${1:---generate}"
+  case "$mode" in
+    --generate)
+      cmd_generate
+      ;;
+    --json)
+      cmd_json
+      ;;
+    --check)
+      cmd_check
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      die "Unknown command: $mode. Use --help for usage."
+      ;;
+  esac
+}
+
+main "$@"

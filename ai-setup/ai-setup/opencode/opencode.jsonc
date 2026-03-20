@@ -1,0 +1,69 @@
+{
+  "plugin": [
+    "oh-my-opencode@3.10.0"
+  ],
+  "$schema": "https://opencode.ai/config.json",
+  "model": "github-copilot/claude-opus-4.6",
+  "small_model": "github-copilot/claude-haiku-4.5",
+  "autoupdate": true,
+  "compaction": {
+    "auto": true
+  },
+  "mcp": {
+    "atlassian": {
+      "type": "local",
+      "enabled": true,
+      "command": ["/bin/zsh", "-lc", "mcp-atlassian-opencode"]
+    },
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "enabled": false
+    },
+    "firebase": {
+      "type": "local",
+      "command": ["npx", "-y", "firebase-tools@latest", "mcp", "--only", "crashlytics"],
+      "enabled": false,
+      "timeout": 10000
+    }
+  },
+  "permission": {
+    "read": "allow",
+    "write": "allow",
+    "edit": "allow",
+    "bash": "allow",
+    "git *": "allow",
+    "git push": "deny",
+    "grep": "allow",
+    "glob": "allow",
+    "list": "allow",
+    "lsp": "allow",
+    "webfetch": "allow",
+    "skill": "allow",
+    "patch": "allow",
+    "task": "allow",
+    "question": "allow",
+    "todowrite": "allow",
+    "todoread": "allow",
+    "external_directory": {
+      "~/.config/opencode/get-shit-done/*": "allow"
+    }
+  },
+  "tools": {
+    "read": true,
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "grep": true,
+    "glob": true,
+    "list": true,
+    "lsp": true,
+    "webfetch": true,
+    "skill": true,
+    "patch": true,
+    "task": true,
+    "question": true,
+    "todowrite": true,
+    "todoread": true
+  }
+}

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SERVICE_PREFIX="opencode-atlassian"
+ACCOUNT="${USER}"
+TOKENS_URL="https://id.atlassian.com/manage-profile/security/api-tokens"
+
+URL="$(security find-generic-password -s "${SERVICE_PREFIX}-url" -a "$ACCOUNT" -w 2>/dev/null || true)"
+EMAIL="$(security find-generic-password -s "${SERVICE_PREFIX}-email" -a "$ACCOUNT" -w 2>/dev/null || true)"
+
+if [[ -z "$URL" || -z "$EMAIL" ]]; then
+	echo "Missing URL/email in Keychain. Run: opencode-atlassian-login" >&2
+	exit 1
+fi
+
+echo "Rotating Atlassian API token for:"
+echo "  URL:   $URL"
+echo "  Email: $EMAIL"
+echo
+echo "Opening token page:"
+echo "  $TOKENS_URL"
+open "$TOKENS_URL"
+echo
+echo "Create a new token (name: opencode-mcp), copy it, then paste here."
+read -r -s -p "New Atlassian API token (input hidden): " TOKEN
+echo
+
+[[ -n "$TOKEN" ]] || {
+	echo "Token empty." >&2
+	exit 1
+}
+
+security add-generic-password -U -s "${SERVICE_PREFIX}-token" -a "$ACCOUNT" -w "$TOKEN" >/dev/null
+echo "✅ Updated token in Keychain."

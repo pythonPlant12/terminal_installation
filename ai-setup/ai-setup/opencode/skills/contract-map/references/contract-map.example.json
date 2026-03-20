@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "contracts": [
+    {
+      "name": "bridge-message-envelope-v1",
+      "watch": [
+        "docs/specs/bridge-message-envelope-v1*.json",
+        "docs/specs/bridge-message-envelope-v1.md",
+        "opencode/opencode.jsonc"
+      ],
+      "allow_consumer_superset": false,
+      "producers": [
+        {
+          "name": "appengine-core",
+          "schema": "docs/specs/bridge-message-envelope-v1.schema.json",
+          "keys": [
+            "type",
+            "version",
+            "source",
+            "correlation_id",
+            "message_id",
+            "timestamp",
+            "traceparent",
+            "payload"
+          ]
+        }
+      ],
+      "consumers": [
+        {
+          "name": "airconsole-web",
+          "schema": "docs/specs/bridge-message-envelope-v1.schema.json",
+          "keys": [
+            "type",
+            "version",
+            "source",
+            "correlation_id",
+            "message_id",
+            "timestamp",
+            "traceparent",
+            "payload"
+          ]
+        },
+        {
+          "name": "androidunity-bridge",
+          "schema": "docs/specs/bridge-message-envelope-v1.schema.json",
+          "keys": [
+            "type",
+            "version",
+            "source",
+            "correlation_id",
+            "message_id",
+            "timestamp",
+            "traceparent",
+            "payload"
+          ]
+        }
+      ]
+    }
+  ]
+}

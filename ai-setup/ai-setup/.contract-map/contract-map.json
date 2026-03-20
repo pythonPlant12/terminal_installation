@@ -1,0 +1,79 @@
+{
+  "version": "1",
+  "contracts": [
+    {
+      "name": "opencode-runtime-config-v1",
+      "watch": [
+        "opencode/opencode.jsonc",
+        "docs/specs/opencode-runtime-config-v1.schema.json",
+        ".contract-map/contract-map.json"
+      ],
+      "allow_consumer_superset": false,
+      "producers": [
+        {
+          "name": "repo-source",
+          "schema": "docs/specs/opencode-runtime-config-v1.schema.json",
+          "keys": [
+            "$schema",
+            "plugin",
+            "model",
+            "small_model",
+            "autoupdate",
+            "compaction",
+            "mcp",
+            "permission",
+            "tools"
+          ]
+        }
+      ],
+      "consumers": [
+        {
+          "name": "sync-contract",
+          "schema": "docs/specs/opencode-runtime-config-v1.schema.json",
+          "keys": [
+            "$schema",
+            "plugin",
+            "model",
+            "small_model",
+            "autoupdate",
+            "compaction",
+            "mcp",
+            "permission",
+            "tools"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "omo-agent-routing-config-v1",
+      "watch": [
+        "opencode/oh-my-opencode.json",
+        "docs/specs/omo-agent-routing-config-v1.schema.json",
+        ".contract-map/contract-map.json"
+      ],
+      "allow_consumer_superset": false,
+      "producers": [
+        {
+          "name": "repo-source",
+          "schema": "docs/specs/omo-agent-routing-config-v1.schema.json",
+          "keys": [
+            "$schema",
+            "agents",
+            "categories"
+          ]
+        }
+      ],
+      "consumers": [
+        {
+          "name": "sync-contract",
+          "schema": "docs/specs/omo-agent-routing-config-v1.schema.json",
+          "keys": [
+            "$schema",
+            "agents",
+            "categories"
+          ]
+        }
+      ]
+    }
+  ]
+}

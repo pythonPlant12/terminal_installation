@@ -1,0 +1,107 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+SCRIPT_PATH="${0:A}"
+ROOT_DIR="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
+source "$ROOT_DIR/scripts/lib.zsh"
+source "$ROOT_DIR/scripts/helpers/migration-helpers.zsh"
+source "$ROOT_DIR/scripts/phases/13-migration-export.zsh"
+
+# ai-setup-export: CLI for migration bundle management
+
+show_help() {
+  cat <<EOF
+Usage: ai-setup-export [COMMAND] [OPTIONS]
+
+Commands:
+  --create              Create new export bundle (default)
+  --list                List export bundles in current directory
+  --verify <bundle>     Verify bundle integrity
+  --help                Show this help
+
+Examples:
+  ai-setup-export                                   # Create new bundle
+  ai-setup-export --list                            # List bundles
+  ai-setup-export --verify ai-setup-backup-*.tar.gz # Verify integrity
+
+EOF
+  exit 0
+}
+
+cmd_create() {
+  phase_13_export "."
+  ok "Use 'ai-setup-export --list' to see exports"
+}
+
+cmd_list() {
+  local bundle_count
+  bundle_count="$(ls ai-setup-backup-*.tar.gz 2>/dev/null | wc -l)"
+  
+  if [[ $bundle_count -eq 0 ]]; then
+    log "No export bundles found in current directory"
+    return 0
+  fi
+  
+  log "Export bundles:"
+  echo ""
+  
+  for bundle_file in $(ls -rt ai-setup-backup-*.tar.gz 2>/dev/null); do
+    local size checksum_file checksum_status
+    size="$(du -h "$bundle_file" | cut -f1)"
+    checksum_file="${bundle_file}.sha256"
+    
+    if [[ -f "$checksum_file" ]]; then
+      checksum_status="✓ verified"
+    else
+      checksum_status="✗ no checksum"
+    fi
+    
+    # Extract timestamp from filename
+    local timestamp
+    timestamp="$(echo "$bundle_file" | sed 's/ai-setup-backup-//;s/.tar.gz//')"
+    
+    printf "  %s - Size: %s, Checksum: %s\n" "$timestamp" "$size" "$checksum_status"
+  done
+  
+  echo ""
+  local total_size
+  total_size="$(du -sh . | cut -f1)"
+  log "Total size: $total_size"
+}
+
+cmd_verify() {
+  local bundle_file="$1"
+  
+  if [[ ! -f "$bundle_file" ]]; then
+    die "Bundle not found: $bundle_file"
+  fi
+  
+  if verify_backup_integrity "$bundle_file"; then
+    ok "Bundle integrity verified: $bundle_file"
+    return 0
+  else
+    die "Bundle integrity check failed: $bundle_file"
+  fi
+}
+
+# Main argument parsing
+case "${1:---create}" in
+  --create)
+    cmd_create
+    ;;
+  --list)
+    cmd_list
+    ;;
+  --verify)
+    if [[ -z "${2:-}" ]]; then
+      die "Usage: ai-setup-export --verify <bundle-file>"
+    fi
+    cmd_verify "$2"
+    ;;
+  --help|-h)
+    show_help
+    ;;
+  *)
+    die "Unknown command: $1. Use --help for usage."
+    ;;
+esac

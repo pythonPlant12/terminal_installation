@@ -1,0 +1,190 @@
+schema_version: 2
+description: Compact, agent-native troubleshooting documents for airconsole-ai-setup.
+
+required_fields:
+  schema_version:
+    type: integer
+    allowed: [2]
+    description: "Schema contract version"
+
+  module:
+    type: string
+    description: "Subsystem name (e.g., Development Workflow, Bootstrap Pipeline)"
+
+  date:
+    type: string
+    pattern: '^\d{4}-\d{2}-\d{2}$'
+    description: "Date when the learning was captured (YYYY-MM-DD)"
+
+  problem_type:
+    type: enum
+    values:
+      - build_error
+      - workflow_issue
+      - developer_experience
+      - documentation_gap
+      - runtime_error
+      - integration_issue
+      - test_failure
+      - security_issue
+      - performance_issue
+      - best_practice
+    description: "Primary category used for routing and retrieval"
+
+  component:
+    type: enum
+    values:
+      - bootstrap
+      - phase-script
+      - helper-script
+      - cli-tool
+      - opencode-config
+      - opencode-hook
+      - opencode-agent
+      - opencode-skill
+      - plugin-system
+      - ci-workflow
+      - auth-flow
+      - migration-recovery
+      - knowledge-system
+      - development-workflow
+      - documentation
+      - tooling
+      - shell-script
+      - unknown
+    description: "Most relevant implementation surface"
+
+  symptoms:
+    type: array[string]
+    min_items: 1
+    max_items: 5
+    description: "Observable signals that indicate this issue"
+
+  root_cause:
+    type: enum
+    values:
+      - config_error
+      - missing_workflow_step
+      - dependency_ordering
+      - stale_documentation
+      - missing_tooling
+      - incomplete_setup
+      - environment_mismatch
+      - logic_error
+      - integration_contract_drift
+      - permission_gap
+      - test_gap
+      - observability_gap
+      - scope_creep
+      - version_drift
+      - unclear_ownership
+      - unknown_root_cause
+    description: "Primary failure mechanism"
+
+  resolution_type:
+    type: enum
+    values:
+      - code_fix
+      - config_change
+      - workflow_improvement
+      - documentation_update
+      - tooling_addition
+      - dependency_update
+      - environment_setup
+      - guardrail_addition
+      - test_fix
+      - rollback
+    description: "Type of intervention that resolved the issue"
+
+  severity:
+    type: enum
+    values: [critical, high, medium, low]
+    description: "Operational impact"
+
+  confidence:
+    type: enum
+    values: [high, medium, low]
+    description: "Confidence that this guidance generalizes"
+
+  summary:
+    type: string
+    max_length: 220
+    description: "One-sentence fix summary for fast retrieval"
+
+  applies_when:
+    type: array[string]
+    min_items: 1
+    max_items: 5
+    description: "When this note is applicable"
+
+  verification_commands:
+    type: array[string]
+    min_items: 1
+    max_items: 5
+    description: "Concrete commands to verify the fix"
+
+  evidence_paths:
+    type: array[string]
+    min_items: 1
+    max_items: 10
+    description: "Repo-relative files/paths supporting this learning"
+
+  tags:
+    type: array[string]
+    min_items: 2
+    max_items: 10
+    description: "Lowercase, hyphen-separated retrieval tags"
+
+optional_fields:
+  avoid_when:
+    type: array[string]
+    max_items: 5
+    description: "Counter-signals where this note should NOT be applied"
+
+  status:
+    type: enum
+    values: [active, superseded, archived]
+    default: active
+    description: "Lifecycle state of the note"
+
+  superseded_by:
+    type: string
+    description: "Path to replacement note when status=superseded"
+
+  related_docs:
+    type: array[string]
+    max_items: 10
+    description: "Relative paths to connected knowledge docs"
+
+directory_mapping:
+  build_error: build-errors
+  workflow_issue: workflow-issues
+  developer_experience: developer-experience
+  documentation_gap: documentation-gaps
+  runtime_error: runtime-errors
+  integration_issue: integration-issues
+  test_failure: test-failures
+  security_issue: security-issues
+  performance_issue: performance-issues
+  best_practice: best-practices
+
+legacy_normalization:
+  problem_type:
+    build-errors: build_error
+    workflow_documentation: documentation_gap
+  component:
+    development_workflow: development-workflow
+    bootstrap-system: bootstrap
+    bootstrap-installation: bootstrap
+  root_cause:
+    fragmented_flow_visibility: stale_documentation
+  resolution_type:
+    documentation: documentation_update
+
+validation_rules:
+  - "Frontmatter must include all required fields for schema_version=2."
+  - "problem_type must map to the parent directory via directory_mapping."
+  - "All paths in evidence_paths and related_docs must be repo-relative."
+  - "summary should be concise and action-oriented."
+  - "Agent Card section must exist in body for fast consumption."
+  - "Prefer <= 220 total lines; warn when exceeding."

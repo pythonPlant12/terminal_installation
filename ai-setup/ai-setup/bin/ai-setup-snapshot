@@ -1,0 +1,180 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+SCRIPT_PATH="${0:A}"
+ROOT_DIR="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
+source "$ROOT_DIR/scripts/lib.zsh"
+source "$ROOT_DIR/scripts/helpers/backup-helpers.zsh"
+source "$ROOT_DIR/scripts/phases/12-snapshot-creation.zsh"
+
+# ai-setup-snapshot: CLI for snapshot management
+
+show_help() {
+  cat <<EOF
+Usage: ai-setup-snapshot [COMMAND] [OPTIONS]
+
+Commands:
+  --create              Create new snapshot (default)
+  --list                List available snapshots
+  --prune [--keep=N]    Remove old snapshots (keep last N, default 5)
+  --help                Show this help
+
+Examples:
+  ai-setup-snapshot --create               # Create new snapshot
+  ai-setup-snapshot --list                 # List all snapshots
+  ai-setup-snapshot --prune --keep=3       # Keep last 3, remove older
+
+EOF
+  exit 0
+}
+
+cmd_create() {
+  phase_12_snapshot "Manual snapshot"
+  ok "Snapshot created. Use 'ai-setup-snapshot --list' to view all snapshots"
+}
+
+cmd_list() {
+  local snapshots_dir="$ROOT_DIR/.backup/snapshots"
+  local -a snapshot_dirs=()
+  
+  if [[ ! -d "$snapshots_dir" ]]; then
+    log "No snapshots found"
+    return 0
+  fi
+
+  local snapshot_dir
+  for snapshot_dir in $(ls -dtr "$snapshots_dir"/* 2>/dev/null); do
+    local snapshot_name
+    snapshot_name="$(basename "$snapshot_dir")"
+
+    if [[ -L "$snapshot_dir" ]]; then
+      warn "Skipping symlink snapshot entry: $snapshot_name"
+      continue
+    fi
+
+    if [[ -d "$snapshot_dir" ]]; then
+      snapshot_dirs+=("$snapshot_dir")
+    fi
+  done
+
+  local snapshot_count="${#snapshot_dirs[@]}"
+  if [[ $snapshot_count -eq 0 ]]; then
+    log "No snapshots found"
+    return 0
+  fi
+  
+  log "Available snapshots:"
+  echo ""
+  
+  for snapshot_dir in "${snapshot_dirs[@]}"; do
+    local manifest="${snapshot_dir}/manifest.json"
+    local snapshot_name
+    snapshot_name="$(basename "$snapshot_dir")"
+    
+    if [[ -f "$manifest" ]]; then
+      local timestamp phase size
+      timestamp="$(jq -r '.timestamp // "unknown"' "$manifest" 2>/dev/null || echo "unknown")"
+      phase="$(jq -r '.phase_completed // "unknown"' "$manifest" 2>/dev/null || echo "unknown")"
+      size="$(du -sh "$snapshot_dir" | cut -f1)"
+      
+      local config_count
+      config_count="$(tar tzf "${snapshot_dir}/config-state.tar.gz" 2>/dev/null | wc -l || echo 0)"
+      
+      # Check if LATEST
+      local latest_marker=""
+      if [[ -L "$ROOT_DIR/.backup/LATEST" ]] && [[ "$(readlink "$ROOT_DIR/.backup/LATEST")" == "$snapshot_name" ]]; then
+        latest_marker=" ← LATEST"
+      fi
+      
+      printf "  %s - %s (%s)%s\n" "$snapshot_name" "$phase" "$size" "$latest_marker"
+      printf "    Config files: %d items, Git bundle: present\n" "$config_count"
+    else
+      printf "  %s (no manifest)\n" "$snapshot_name"
+    fi
+  done
+  
+  echo ""
+  local total_size
+  total_size="$(du -sh "$snapshots_dir" 2>/dev/null | cut -f1)"
+  log "Total snapshot size: $total_size"
+}
+
+cmd_prune() {
+  local keep="${1:-5}"
+  local snapshots_dir="$ROOT_DIR/.backup/snapshots"
+  local -a snapshot_dirs=()
+  
+  if [[ ! -d "$snapshots_dir" ]]; then
+    log "No snapshots to prune"
+    return 0
+  fi
+
+  local snapshot_dir
+  for snapshot_dir in $(ls -dt "$snapshots_dir"/* 2>/dev/null); do
+    local snapshot_name
+    snapshot_name="$(basename "$snapshot_dir")"
+
+    if [[ -L "$snapshot_dir" ]]; then
+      warn "Skipping symlink snapshot entry: $snapshot_name"
+      continue
+    fi
+
+    if [[ -d "$snapshot_dir" ]]; then
+      snapshot_dirs+=("$snapshot_dir")
+    fi
+  done
+
+  local snapshot_count="${#snapshot_dirs[@]}"
+  if [[ $snapshot_count -le $keep ]]; then
+    log "Only $snapshot_count snapshots (keeping $keep), nothing to prune"
+    return 0
+  fi
+  
+  log "Pruning snapshots (keeping last $keep)..."
+  
+  local to_remove=$((snapshot_count - keep))
+  local index=1
+
+  for snapshot_dir in "${snapshot_dirs[@]}"; do
+    if (( index <= keep )); then
+      index=$((index + 1))
+      continue
+    fi
+
+    local size
+    size="$(du -sh "$snapshot_dir" | cut -f1)"
+    local snapshot_name
+    snapshot_name="$(basename "$snapshot_dir")"
+    
+    warn "Removing: $snapshot_name ($size)"
+    rm -rf "$snapshot_dir"
+    index=$((index + 1))
+  done
+  
+  local freed_size
+  freed_size="$(du -sh "$snapshots_dir" 2>/dev/null | cut -f1)"
+  ok "Pruned $to_remove snapshots. Total size now: $freed_size"
+}
+
+# Main argument parsing
+case "${1:---create}" in
+  --create)
+    cmd_create
+    ;;
+  --list)
+    cmd_list
+    ;;
+  --prune)
+    local keep_count=5
+    if [[ -n "${2:-}" && "$2" == --keep=* ]]; then
+      keep_count="${2#--keep=}"
+    fi
+    cmd_prune "$keep_count"
+    ;;
+  --help|-h)
+    show_help
+    ;;
+  *)
+    die "Unknown command: $1. Use --help for usage."
+    ;;
+esac

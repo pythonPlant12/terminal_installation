@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SERVICE="opencode-atlassian"
+ACCOUNT="${USER}"
+
+# read from Keychain
+ATLASSIAN_URL="$(security find-generic-password -s "$SERVICE-url" -a "$ACCOUNT" -w 2>/dev/null || true)"
+ATLASSIAN_EMAIL="$(security find-generic-password -s "$SERVICE-email" -a "$ACCOUNT" -w 2>/dev/null || true)"
+ATLASSIAN_TOKEN="$(security find-generic-password -s "$SERVICE-token" -a "$ACCOUNT" -w 2>/dev/null || true)"
+
+if [[ -z "${ATLASSIAN_URL}" || -z "${ATLASSIAN_EMAIL}" || -z "${ATLASSIAN_TOKEN}" ]]; then
+	echo "Missing Atlassian creds in Keychain. Run: opencode-atlassian-login" >&2
+	exit 1
+fi
+
+export JIRA_URL="$ATLASSIAN_URL"
+export JIRA_USERNAME="$ATLASSIAN_EMAIL"
+export JIRA_API_TOKEN="$ATLASSIAN_TOKEN"
+
+export CONFLUENCE_URL="$ATLASSIAN_URL"
+export CONFLUENCE_USERNAME="$ATLASSIAN_EMAIL"
+export CONFLUENCE_API_TOKEN="$ATLASSIAN_TOKEN"
+
+exec uvx mcp-atlassian

@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SERVICE_PREFIX="opencode-atlassian"
+ACCOUNT="${USER}"
+TOKENS_URL="https://id.atlassian.com/manage-profile/security/api-tokens"
+URL="https://ndream.atlassian.net"
+
+# Skip interactive prompts if running in bootstrap subprocess (non-TTY context)
+if [[ "${AIRCONSOLE_BOOTSTRAP_SUBPROCESS:-0}" == "1" ]] || [[ ! -t 0 ]]; then
+  echo "Running in non-interactive context; skipping Atlassian login"
+  exit 0
+fi
+
+
+echo
+echo "Atlassian MCP setup (one-time)"
+echo
+echo "What you need BEFORE continuing:"
+echo "  1) You must generate an Atlassian API token in your browser."
+echo "  2) You must copy it immediately (you won't see it again)."
+echo "  3) You must know your n-dream username."
+echo
+echo "What this script will do:"
+echo "  - Open the Atlassian API tokens page"
+echo "  - Ask for your n-dream username"
+echo "  - Ask you to paste the token (input hidden)"
+echo "  - Store it in macOS Keychain (not in files)"
+echo
+
+read -r -p "Ready to generate the token now? (press Enter to continue, Ctrl-C to abort) " _
+
+echo
+echo "Opening:"
+echo "  $TOKENS_URL"
+open "$TOKENS_URL"
+
+echo
+echo "In the browser:"
+echo "  - Click 'Create API token'"
+echo "  - Name it: opencode-mcp"
+echo "  - Copy the token"
+echo
+
+read -r -p "n-dream username (e.g. john): " USERNAME
+
+read -r -s -p "Paste Atlassian API token (input hidden): " TOKEN
+echo
+
+if [[ -z "${USERNAME}" || -z "${TOKEN}" ]]; then
+	echo "Username and token are required." >&2
+	exit 1
+fi
+
+EMAIL="${USERNAME}@n-dream.com"
+
+# Store (idempotent update)
+security add-generic-password -U -s "${SERVICE_PREFIX}-url" -a "$ACCOUNT" -w "$URL" >/dev/null
+security add-generic-password -U -s "${SERVICE_PREFIX}-email" -a "$ACCOUNT" -w "$EMAIL" >/dev/null
+security add-generic-password -U -s "${SERVICE_PREFIX}-token" -a "$ACCOUNT" -w "$TOKEN" >/dev/null
+
+echo "✅ Stored in Keychain."
+
+# Optional verification (Jira "myself" endpoint is usually safe)
+if command -v curl >/dev/null 2>&1; then
+	code="$(curl -s -o /dev/null -w "%{http_code}" \
+		-u "${EMAIL}:${TOKEN}" \
+		"${URL}/rest/api/3/myself" || true)"
+	if [[ "$code" == "200" ]]; then
+		echo "✅ Verified with username: $USERNAME"
+	else
+		echo "⚠️  Token check failed (HTTP $code). Username/token may be wrong or Jira API access is restricted."
+	fi
+fi

@@ -1,0 +1,214 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+SCRIPT_PATH="${0:A}"
+ROOT_DIR="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
+source "$ROOT_DIR/scripts/lib.zsh"
+source "$ROOT_DIR/scripts/helpers/backup-helpers.zsh"
+
+# ai-setup-rollback: CLI for restoring from snapshots with safety gates
+
+show_help() {
+  cat <<EOF
+Usage: ai-setup-rollback [COMMAND] [OPTIONS]
+
+Commands:
+  --list                    List available snapshots for restore
+  --from <timestamp>        Restore from specific snapshot (requires confirmation)
+  --dry-run --from <ts>     Preview changes without restoring
+  --undo <pre-restore-dir>  Undo most recent restore
+  --help                    Show this help
+
+Examples:
+  ai-setup-rollback --list                           # View snapshots
+  ai-setup-rollback --dry-run --from 2026-02-22T...  # Preview changes
+  ai-setup-rollback --from 2026-02-22T...            # Restore (will prompt)
+  ai-setup-rollback --undo .backup/pre-restore-...   # Undo restore
+
+Safety:
+  - Dry-run shows what would change before confirming
+  - Confirmation required before any restore
+  - Pre-restore backup created automatically (enables undo)
+  - Cross-machine warnings if hostname/macOS differs
+
+EOF
+  exit 0
+}
+
+cmd_list() {
+  local snapshots_dir="$ROOT_DIR/.backup/snapshots"
+  
+  if [[ ! -d "$snapshots_dir" ]]; then
+    log "No snapshots found"
+    return 0
+  fi
+  
+  local snapshot_count
+  snapshot_count="$(ls -d "$snapshots_dir"/* 2>/dev/null | wc -l)"
+  
+  if [[ $snapshot_count -eq 0 ]]; then
+    log "No snapshots found"
+    return 0
+  fi
+  
+  log "Available snapshots:"
+  echo ""
+  
+  for snapshot_dir in $(ls -dtr "$snapshots_dir"/*); do
+    local manifest="${snapshot_dir}/manifest.json"
+    
+    if [[ -f "$manifest" ]]; then
+      local timestamp phase size
+      timestamp="$(jq -r '.timestamp // "unknown"' "$manifest" 2>/dev/null || echo "unknown")"
+      phase="$(jq -r '.phase_completed // "unknown"' "$manifest" 2>/dev/null || echo "unknown")"
+      size="$(du -sh "$snapshot_dir" | cut -f1)"
+      
+      printf "  Timestamp: %s\n" "$timestamp"
+      printf "  Phase: %s, Size: %s\n" "$phase" "$size"
+      echo ""
+    fi
+  done
+}
+
+cmd_dry_run() {
+  local timestamp="$1"
+  local snapshot_dir
+
+  if ! snapshot_dir="$(resolve_snapshot_dir "$timestamp")"; then
+    die "Cannot use snapshot: $timestamp"
+  fi
+  
+  log "Dry-run: Preview changes from $timestamp"
+  echo ""
+  
+  preview_config_changes "$snapshot_dir" || true
+  
+  log "No changes made (dry-run only)"
+}
+
+cmd_restore() {
+  local timestamp="$1"
+  local snapshot_dir
+
+  if ! snapshot_dir="$(resolve_snapshot_dir "$timestamp")"; then
+    die "Cannot use snapshot: $timestamp"
+  fi
+  
+  local manifest="${snapshot_dir}/manifest.json"
+  if [[ ! -f "$manifest" ]]; then
+    die "Manifest not found in snapshot"
+  fi
+  
+  # Show preview
+  log "Changes that will be restored:"
+  preview_config_changes "$snapshot_dir" || true
+  
+  # Check for cross-machine issues
+  local snapshot_hostname snapshot_macos current_hostname current_macos
+  snapshot_hostname="$(jq -r '.hostname // "unknown"' "$manifest" 2>/dev/null || echo "unknown")"
+  snapshot_macos="$(jq -r '.macos_version // "unknown"' "$manifest" 2>/dev/null || echo "unknown")"
+  current_hostname="$(hostname -s)"
+  current_macos="$(sw_vers -productVersion 2>/dev/null || echo "unknown")"
+  
+  if [[ "$snapshot_hostname" != "$current_hostname" ]]; then
+    warn "⚠️  Snapshot from different machine: $snapshot_hostname (current: $current_hostname)"
+  fi
+  
+  if [[ "$snapshot_macos" != "$current_macos" ]]; then
+    warn "⚠️  Snapshot from different macOS version: $snapshot_macos (current: $current_macos)"
+  fi
+  
+  # Require confirmation
+  echo ""
+  print -n "Type 'restore' to confirm or Ctrl-C to abort: "
+  read -r confirmation
+  
+  if [[ "$confirmation" != "restore" ]]; then
+    log "Restore cancelled"
+    return 0
+  fi
+  
+  log "Creating pre-restore backup..."
+  if ! backup_current_state_for_restore "$snapshot_dir"; then
+    warn "Pre-restore backup failed (continuing with restore)"
+  fi
+  
+  log "Restoring configuration..."
+  if ! restore_config_state "$snapshot_dir"; then
+    die "Config restore failed"
+  fi
+  
+  # Find the pre-restore directory that was just created
+  local pre_restore_dir
+  pre_restore_dir="$(ls -dtr "$ROOT_DIR/.backup/pre-restore-"* 2>/dev/null | tail -1)"
+  
+  if [[ -n "$pre_restore_dir" ]]; then
+    ok "Restore complete. Previous state backed up to $pre_restore_dir"
+    log "To undo this restore, run: ai-setup-rollback --undo $pre_restore_dir"
+  else
+    ok "Restore complete"
+  fi
+}
+
+cmd_undo() {
+  local pre_restore_dir="$1"
+  
+  if [[ ! -d "$pre_restore_dir" ]]; then
+    die "Pre-restore directory not found: $pre_restore_dir"
+  fi
+  
+  local state_tar="${pre_restore_dir}/current-state.tar.gz"
+  if [[ ! -f "$state_tar" ]]; then
+    die "Current state tar not found in pre-restore directory"
+  fi
+  
+  log "Undo: Restoring from pre-restore backup: $pre_restore_dir"
+  
+  # Require confirmation again
+  echo ""
+  print -n "Type 'undo' to confirm or Ctrl-C to abort: "
+  read -r confirmation
+  
+  if [[ "$confirmation" != "undo" ]]; then
+    log "Undo cancelled"
+    return 0
+  fi
+  
+  log "Restoring previous state..."
+  if ! tar xzf "$state_tar" -C / >/dev/null 2>&1; then
+    die "Undo extraction failed"
+  fi
+  
+  ok "Undo complete. Setup restored to state before restore operation"
+}
+
+# Main argument parsing
+case "${1:---help}" in
+  --list)
+    cmd_list
+    ;;
+  --dry-run)
+    if [[ -z "${2:-}" || "$2" != "--from" ]] || [[ -z "${3:-}" ]]; then
+      die "Usage: ai-setup-rollback --dry-run --from <timestamp>"
+    fi
+    cmd_dry_run "$3"
+    ;;
+  --from)
+    if [[ -z "${2:-}" ]]; then
+      die "Usage: ai-setup-rollback --from <timestamp>"
+    fi
+    cmd_restore "$2"
+    ;;
+  --undo)
+    if [[ -z "${2:-}" ]]; then
+      die "Usage: ai-setup-rollback --undo <pre-restore-dir>"
+    fi
+    cmd_undo "$2"
+    ;;
+  --help|-h)
+    show_help
+    ;;
+  *)
+    die "Unknown command: $1. Use --help for usage."
+    ;;
+esac

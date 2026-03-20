@@ -1,0 +1,28 @@
+{
+  "steps": [
+    {
+      "id": "06-opencode-plugins",
+      "marker": "scripts/phases/06-opencode-plugins.zsh"
+    },
+    {
+      "id": "sync-opencode-config",
+      "marker": "scripts/link_opencode.zsh"
+    },
+    {
+      "id": "skill-inventory",
+      "marker": "\"$ROOT_DIR/bin/ai-setup-skill-inventory\" --generate"
+    },
+    {
+      "id": "07-verify-integrations",
+      "marker": "scripts/phases/07-verify-integrations.zsh"
+    },
+    {
+      "id": "08-atlassian-login",
+      "marker": "scripts/phases/08-atlassian-login.zsh"
+    },
+    {
+      "id": "11-verify-readiness",
+      "marker": "scripts/phases/11-verify-readiness.zsh"
+    }
+  ]
+}

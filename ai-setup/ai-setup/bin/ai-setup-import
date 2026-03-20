@@ -1,0 +1,201 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+SCRIPT_PATH="${0:A}"
+ROOT_DIR="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
+source "$ROOT_DIR/scripts/lib.zsh"
+source "$ROOT_DIR/scripts/helpers/migration-helpers.zsh"
+
+# ai-setup-import: CLI for restoring migration bundle on new machine
+
+show_help() {
+  cat <<EOF
+Usage: ai-setup-import [COMMAND] <bundle-file>
+
+Commands:
+  (default)            Extract bundle and show next steps (interactive)
+  --verify <bundle>    Check bundle before import (preview)
+  --bootstrap <bundle> Extract + run bootstrap automatically
+  --credentials        Re-enter credentials after bootstrap
+  --help               Show this help
+
+Examples:
+  ai-setup-import ai-setup-backup-2026-02-22.tar.gz    # Interactive extract
+  ai-setup-import --verify ai-setup-backup-*.tar.gz    # Preview bundle
+  ai-setup-import --bootstrap ai-setup-backup-*.tar.gz # Auto-extract + bootstrap
+
+Workflow:
+  1. ai-setup-import ai-setup-backup-*.tar.gz           # Extract
+  2. cd airconsole-ai-setup
+  3. ./bootstrap.zsh                                    # Install tools
+  4. Re-enter credentials when prompted
+
+EOF
+  exit 0
+}
+
+cmd_verify() {
+  local bundle_file="$1"
+  
+  if [[ ! -f "$bundle_file" ]]; then
+    die "Bundle not found: $bundle_file"
+  fi
+  
+  log "Verifying bundle: $bundle_file"
+  
+  if ! verify_backup_integrity "$bundle_file"; then
+    die "Bundle integrity check failed"
+  fi
+  
+  log "Extracting manifest preview..."
+  local manifest_content
+  manifest_content="$(tar xzOf "$bundle_file" airconsole-ai-setup/MIGRATION-MANIFEST.md 2>/dev/null || echo "")"
+  
+  if [[ -n "$manifest_content" ]]; then
+    echo ""
+    echo "$manifest_content"
+  else
+    log "(Manifest not found in bundle)"
+  fi
+}
+
+cmd_extract() {
+  local bundle_file="$1"
+  
+  if [[ ! -f "$bundle_file" ]]; then
+    die "Bundle not found: $bundle_file"
+  fi
+  
+  log "Preparing to extract: $bundle_file"
+  
+  # Verify integrity
+  if ! verify_backup_integrity "$bundle_file"; then
+    die "Bundle integrity check failed - will not extract"
+  fi
+  
+  # Show what's in bundle
+  log "Bundle contents:"
+  local manifest_content
+  manifest_content="$(tar xzOf "$bundle_file" airconsole-ai-setup/MIGRATION-MANIFEST.md 2>/dev/null || echo "")"
+  
+  if [[ -n "$manifest_content" ]]; then
+    # Show just the metadata sections
+    echo "$manifest_content" | head -30
+  fi
+  
+  # Check platform compatibility
+  log ""
+  log "Platform compatibility:"
+  local platform_info
+  platform_info="$(tar xzOf "$bundle_file" airconsole-ai-setup/.backup-platform-info.json 2>/dev/null || echo "")"
+  
+  local current_macos current_arch
+  current_macos="$(sw_vers -productVersion 2>/dev/null || echo 'unknown')"
+  current_arch="$(uname -m)"
+  
+  log "Current machine: macOS $current_macos, $current_arch"
+  
+  if [[ -n "$platform_info" ]]; then
+    local bundle_macos bundle_arch
+    bundle_macos="$(echo "$platform_info" | jq -r '.macos_version // "unknown"' 2>/dev/null || echo 'unknown')"
+    bundle_arch="$(echo "$platform_info" | jq -r '.architecture // "unknown"' 2>/dev/null || echo 'unknown')"
+    
+    log "Bundle from: macOS $bundle_macos, $bundle_arch"
+    
+    if [[ "$bundle_macos" != "$current_macos" ]] || [[ "$bundle_arch" != "$current_arch" ]]; then
+      warn "⚠️  Platform differs from bundle. Run bootstrap to re-converge tools for this machine."
+    fi
+  fi
+  
+  # Require confirmation
+  echo ""
+  print -n "Extract bundle to current directory? (yes/no): "
+  read -r confirmation
+  
+  if [[ "$confirmation" != "yes" ]]; then
+    log "Extract cancelled"
+    return 0
+  fi
+  
+  # Extract
+  if extract_migration_bundle "$bundle_file" "."; then
+    ok "Bundle extracted successfully"
+    log ""
+    log "Next steps:"
+    log "  1. cd airconsole-ai-setup"
+    log "  2. ./bootstrap.zsh"
+    log "  3. Re-enter credentials when prompted"
+    log ""
+  else
+    die "Extraction failed"
+  fi
+}
+
+cmd_bootstrap() {
+  local bundle_file="$1"
+  
+  log "Auto-extract + bootstrap mode"
+  
+  if extract_migration_bundle "$bundle_file" "."; then
+    ok "Bundle extracted"
+    log ""
+    log "Running bootstrap..."
+    log ""
+    
+    if cd airconsole-ai-setup && ./bootstrap.zsh; then
+      ok "Bootstrap completed successfully"
+      log "Run 'ai-setup-doctor' to check integration health"
+    else
+      die "Bootstrap failed"
+    fi
+  else
+    die "Extraction failed"
+  fi
+}
+
+cmd_credentials() {
+  log "Re-entering credentials workflow..."
+  
+  # Source auth phase scripts
+  local atlassian_script
+  atlassian_script="$ROOT_DIR/scripts/phases/08-atlassian-login.zsh"
+
+  if [[ -f "$atlassian_script" ]]; then
+    source "$atlassian_script"
+    log ""
+    log "Atlassian credentials:"
+    phase_08_atlassian_login || true
+  fi
+  
+  ok "Credential re-entry complete"
+}
+
+# Main argument parsing
+case "${1:---help}" in
+  --verify)
+    if [[ -z "${2:-}" ]]; then
+      die "Usage: ai-setup-import --verify <bundle-file>"
+    fi
+    cmd_verify "$2"
+    ;;
+  --bootstrap)
+    if [[ -z "${2:-}" ]]; then
+      die "Usage: ai-setup-import --bootstrap <bundle-file>"
+    fi
+    cmd_bootstrap "$2"
+    ;;
+  --credentials)
+    cmd_credentials
+    ;;
+  --help|-h)
+    show_help
+    ;;
+  *)
+    # Treat as bundle file (default: interactive extract)
+    if [[ -z "${1:-}" ]]; then
+      show_help
+    else
+      cmd_extract "$1"
+    fi
+    ;;
+esac

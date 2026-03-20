@@ -1,0 +1,4 @@
+interface:
+  display_name: "Phase Contract Checklist"
+  short_description: "Define phase contracts and enforce drift checks in CI"
+  default_prompt: "Define phase contracts, add checklist artifacts, and enforce merge-blocking drift checks for labels and phase files."

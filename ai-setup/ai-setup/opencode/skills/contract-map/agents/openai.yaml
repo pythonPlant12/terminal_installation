@@ -1,0 +1,4 @@
+interface:
+  display_name: "Contract Map Gate"
+  short_description: "Producer/consumer key-alignment and schema gate"
+  default_prompt: "Use $contract-map to enforce producer/consumer key alignment and schema checks for config-affecting PRs."

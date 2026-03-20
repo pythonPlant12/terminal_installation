@@ -1,0 +1,4 @@
+interface:
+  display_name: "Shell Pre-Merge Checklist"
+  short_description: "Mandatory shell safety gate before merge"
+  default_prompt: "Use $pre-merge-shell-checklist to run the required shell pre-merge safety checks."

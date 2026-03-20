@@ -1,0 +1,328 @@
+{
+  "phases": [
+    {
+      "id": "01",
+      "label": "preflight",
+      "script": "scripts/phases/01-preflight.zsh",
+      "inputs": [
+        "macos-runtime",
+        "network-access"
+      ],
+      "outputs": [
+        "homebrew-ready",
+        "git-ready",
+        "zsh-ready"
+      ],
+      "side_effects": [
+        "checks-platform",
+        "installs-homebrew-if-missing"
+      ],
+      "must_run_after": [],
+      "behavior_markers": [
+        "require_macos_supported",
+        "require_cmd git",
+        "raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+      ]
+    },
+    {
+      "id": "02",
+      "label": "dependencies",
+      "script": "scripts/phases/02-dependencies.zsh",
+      "inputs": [
+        "Brewfile",
+        "network-access",
+        "nvm-home"
+      ],
+      "outputs": [
+        "brew-dependencies-ready",
+        "node-runtime-ready",
+        "bun-runtime-ready"
+      ],
+      "side_effects": [
+        "installs-brew-packages",
+        "installs-node-runtime",
+        "installs-bun-runtime",
+        "writes-nvmrc"
+      ],
+      "must_run_after": [
+        "01"
+      ],
+      "behavior_markers": [
+        "brew bundle install --file",
+        "nvm install --lts",
+        "https://bun.sh/install"
+      ]
+    },
+    {
+      "id": "03",
+      "label": "tools",
+      "script": "scripts/phases/03-tools.zsh",
+      "inputs": [
+        "scripts/ensure-tools.zsh",
+        "shell-path-state"
+      ],
+      "outputs": [
+        "tool-checks-complete"
+      ],
+      "side_effects": [
+        "runs-tool-checks"
+      ],
+      "must_run_after": [
+        "02"
+      ],
+      "behavior_markers": [
+        "scripts/ensure-tools.zsh",
+        "ensure_opencode_present_or_warn"
+      ]
+    },
+    {
+      "id": "05",
+      "label": "bin-link-setup",
+      "script": "scripts/phases/05-bin-link-setup.zsh",
+      "inputs": [
+        "scripts/link_bin.zsh",
+        "home-local-bin"
+      ],
+      "outputs": [
+        "managed-bin-links-ready"
+      ],
+      "side_effects": [
+        "writes-bin-links"
+      ],
+      "must_run_after": [
+        "03"
+      ],
+      "behavior_markers": [
+        "is_interactive",
+        "scripts/link_bin.zsh"
+      ]
+    },
+    {
+      "id": "06",
+      "label": "opencode-plugins",
+      "script": "scripts/phases/06-opencode-plugins.zsh",
+      "inputs": [
+        "opencode/opencode.jsonc",
+        "bun-runtime-ready",
+        "npm-registry-access"
+      ],
+      "outputs": [
+        "opencode-plugins-installed",
+        "gsd-installed",
+        "gsd-workflows-patched"
+      ],
+      "side_effects": [
+        "installs-opencode-plugins",
+        "installs-global-gsd",
+        "patches-gsd-workflows"
+      ],
+      "must_run_after": [
+        "05"
+      ],
+      "behavior_markers": [
+        "scripts/install-opencode-plugins.zsh",
+        "scripts/install-gsd.zsh",
+        "patch-gsd-learnings.zsh"
+      ]
+    },
+    {
+      "id": "07",
+      "label": "verify-integrations",
+      "script": "scripts/phases/07-verify-integrations.zsh",
+      "inputs": [
+        "synced-opencode-config",
+        "docker-cli-state"
+      ],
+      "outputs": [
+        "integration-status-reported"
+      ],
+      "side_effects": [
+        "reports-health-status"
+      ],
+      "must_run_after": [
+        "06"
+      ],
+      "behavior_markers": [
+        "verify_docker_desktop",
+        "mcp-atlassian-opencode"
+      ]
+    },
+    {
+      "id": "08",
+      "label": "atlassian-login",
+      "script": "scripts/phases/08-atlassian-login.zsh",
+      "inputs": [
+        "opencode/opencode.jsonc",
+        "docker-cli-state",
+        "keychain-atlassian-credentials"
+      ],
+      "outputs": [
+        "atlassian-credentials-ready"
+      ],
+      "side_effects": [
+        "writes-keychain",
+        "validates-remote-auth"
+      ],
+      "must_run_after": [
+        "07"
+      ],
+      "behavior_markers": [
+        "opencode-atlassian-login",
+        "validate_atlassian_token",
+        "ATLASSIAN_SITE_URL"
+      ]
+    },
+    {
+      "id": "09",
+      "label": "codex-login",
+      "script": "scripts/phases/09-codex-login.zsh",
+      "inputs": [
+        "codex-cli-state"
+      ],
+      "outputs": [
+        "codex-auth-status-reported"
+      ],
+      "side_effects": [
+        "reports-auth-status"
+      ],
+      "must_run_after": [
+        "08"
+      ],
+      "behavior_markers": [
+        "codex login status"
+      ]
+    },
+    {
+      "id": "10",
+      "label": "copilot-login",
+      "script": "scripts/phases/10-copilot-login.zsh",
+      "inputs": [
+        "copilot-cli-state"
+      ],
+      "outputs": [
+        "copilot-auth-status-reported"
+      ],
+      "side_effects": [
+        "reports-auth-status"
+      ],
+      "must_run_after": [
+        "09"
+      ],
+      "behavior_markers": [
+        "~/.copilot/config.json"
+      ]
+    },
+    {
+      "id": "11",
+      "label": "verify-readiness",
+      "script": "scripts/phases/11-verify-readiness.zsh",
+      "inputs": [
+        "keychain-atlassian-credentials",
+        "linked-recovery-cli"
+      ],
+      "outputs": [
+        "readiness-status-reported"
+      ],
+      "side_effects": [
+        "reports-health-status"
+      ],
+      "must_run_after": [
+        "08"
+      ],
+      "behavior_markers": [
+        "report_health_summary",
+        "retrieve_from_keychain",
+        "check_tool_available_or_linked"
+      ]
+    },
+    {
+      "id": "12",
+      "label": "snapshot-creation",
+      "script": "scripts/phases/12-snapshot-creation.zsh",
+      "inputs": [
+        "backup-helpers",
+        "repository-state"
+      ],
+      "outputs": [
+        "snapshot-created-or-skipped"
+      ],
+      "side_effects": [
+        "writes-backup-snapshot",
+        "updates-latest-symlink"
+      ],
+      "must_run_after": [
+        "11"
+      ],
+      "behavior_markers": [
+        "create_unique_snapshot_dir",
+        "backup_repository",
+        "write_snapshot_manifest"
+      ]
+    },
+    {
+      "id": "13",
+      "label": "migration-export",
+      "script": "scripts/phases/13-migration-export.zsh",
+      "inputs": [
+        "migration-helpers",
+        "repository-state",
+        "output-directory"
+      ],
+      "outputs": [
+        "migration-bundle-created"
+      ],
+      "side_effects": [
+        "writes-export-bundle",
+        "writes-checksum"
+      ],
+      "must_run_after": [
+        "11"
+      ],
+      "behavior_markers": [
+        "capture_platform_info",
+        "export_backup_for_migration",
+        "create_integrity_checksum"
+      ]
+    },
+    {
+      "id": "90",
+      "label": "remove-preflight",
+      "script": "scripts/phases/90-remove-preflight.zsh",
+      "inputs": [
+        "requested-removal-components",
+        "macos-runtime"
+      ],
+      "outputs": [
+        "removal-preflight-passed"
+      ],
+      "side_effects": [
+        "validates-removal-prerequisites"
+      ],
+      "must_run_after": [],
+      "behavior_markers": [
+        "--component",
+        "require_cmd npm"
+      ]
+    },
+    {
+      "id": "93",
+      "label": "remove-gsd",
+      "script": "scripts/phases/93-remove-gsd.zsh",
+      "inputs": [
+        "scripts/remove-gsd.zsh"
+      ],
+      "outputs": [
+        "gsd-removed"
+      ],
+      "side_effects": [
+        "removes-global-gsd"
+      ],
+      "must_run_after": [
+        "90"
+      ],
+      "behavior_markers": [
+        "scripts/remove-gsd.zsh"
+      ]
+    }
+  ]
+}

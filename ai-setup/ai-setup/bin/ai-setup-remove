@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# User-facing CLI for removing AI setup components
+# Delegates to the removal system orchestrator
+
+REPO_ROOT="$(cd "$(dirname "$(dirname "$0")")" && pwd)"
+
+# Ensure scripts/remove-system.zsh exists
+if [[ ! -f "$REPO_ROOT/scripts/remove-system.zsh" ]]; then
+  echo "❌ Removal system not found at $REPO_ROOT/scripts/remove-system.zsh" >&2
+  exit 1
+fi
+
+# Make it executable if needed
+chmod +x "$REPO_ROOT/scripts/remove-system.zsh" 2>/dev/null || true
+
+# Delegate to the removal orchestrator
+exec zsh "$REPO_ROOT/scripts/remove-system.zsh" "$@"

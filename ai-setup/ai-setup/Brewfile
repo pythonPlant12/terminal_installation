@@ -1,0 +1,4 @@
+brew "git"
+brew "gh"
+brew "anomalyco/tap/opencode"
+brew "uv"
