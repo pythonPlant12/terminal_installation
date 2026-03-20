@@ -37,43 +37,43 @@ deleted = "[●](#f38ba8)"
 [nodejs]
 symbol = "󰎙 "
 style = "bold #a6e3a1"
-format = "via [$symbol($version )]($style)"
+format = "[$symbol($version )]($style)"
 
 [rust]
 symbol = "🦀 "
 style = "bold #fab387"
-format = "via [$symbol($version )]($style)"
+format = "[$symbol($version )]($style)"
 
 [python]
 symbol = "󰌠 "
 pyenv_version_name = true
 style = "bold #f9e2af"
-format = "via [$symbol$virtualenv$version]($style) "
+format = "[$symbol$virtualenv$version]($style) "
 
 [golang]
 symbol = "🐹 "
 style = "bold #89dceb"
-format = "via [$symbol($version )]($style)"
+format = "[$symbol($version )]($style)"
 
 [java]
 symbol = "☕ "
 style = "bold #f38ba8"
-format = "via [$symbol($version )]($style)"
+format = "[$symbol($version )]($style)"
 
 [php]
 symbol = "🐘 "
 style = "bold #cba6f7"
-format = "via [$symbol($version )]($style)"
+format = "[$symbol($version )]($style)"
 
 [dart]
 symbol = "🎯 "
 style = "bold #89b4fa"
-format = "via [$symbol($version )]($style)"
+format = "[$symbol($version )]($style)"
 
 [docker_context]
 symbol = "🐳 "
 style = "bold #89b4fa"
-format = "via [$symbol$context]($style) "
+format = "[$symbol$context]($style) "
 
 [kubernetes]
 symbol = "⎈ "
