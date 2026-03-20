@@ -27,7 +27,7 @@ Ensure you have these installed:
 
 ```bash
 # Navigate to the terminal installation directory
-cd ~/programming/terminal_installation
+cd ~/programming/personal/terminal_installation
 
 # Run the universal installation script (auto-detects OS)
 ./install.sh
@@ -35,6 +35,34 @@ cd ~/programming/terminal_installation
 # Or run OS-specific scripts directly:
 ./install-macos.sh    # For macOS
 ./install-ubuntu.sh   # For Ubuntu/Debian
+```
+
+### New macOS machine (exact setup used here)
+
+```bash
+# Clone config repo
+git clone git@personal:pythonPlant12/terminal_installation.git ~/programming/personal/terminal_installation
+cd ~/programming/personal/terminal_installation
+
+# Run installer
+chmod +x install.sh install-macos.sh
+./install-macos.sh
+
+# Apply lsd Catppuccin config (not handled by install script)
+mkdir -p ~/.config/lsd
+cp lsd/config.yaml ~/.config/lsd/config.yaml
+cp lsd/colors.yaml ~/.config/lsd/colors.yaml
+
+# Re-apply zsh-autocomplete Catppuccin history highlight patch
+cd ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete
+git apply ~/programming/personal/terminal_installation/zsh-autocomplete/catppuccin-history-highlight.patch
+
+# Optional: clone exact Neovim setup used in this environment
+git clone git@personal:pythonPlant12/lazyVim.git ~/.config/nvim
+nvim --headless "+qa"
+
+# Reload shell
+source ~/.zshrc
 ```
 
 ### Manual Installation
