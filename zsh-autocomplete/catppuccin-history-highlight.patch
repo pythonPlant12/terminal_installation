@@ -1,0 +1,15 @@
+diff --git a/Completions/_autocomplete__history_lines b/Completions/_autocomplete__history_lines
+index 91d83c9..93ba40d 100644
+--- a/Completions/_autocomplete__history_lines
++++ b/Completions/_autocomplete__history_lines
+@@ -58,8 +58,8 @@ _autocomplete__history_lines() {
+ 
+   local -P groups="${(l:$(( 2 * $#words[CURRENT] ))::=0:):-}"
+   _comp_colors=(
+-      "=(#b)${numpat}${lbuffer}(${query})${rbuffer}${rbuffer:+[[:blank:]]#}=2=2=0=0=30;103$groups"
+-      "=(#b)${numpat}${lbuffer}(${query})*=2=2=0=30;103$groups"
++      "=(#b)${numpat}${lbuffer}(${query})${rbuffer}${rbuffer:+[[:blank:]]#}=2=2=0=0=48;2;88;91;112$groups"
++      "=(#b)${numpat}${lbuffer}(${query})*=2=2=0=48;2;88;91;112$groups"
+       "=(#b)${numpat}${lbuffer}(*)=2=2=0"
+       "=(#b)${numpat}*=0=2"
+       ${(M)_comp_colors:#ma=*}

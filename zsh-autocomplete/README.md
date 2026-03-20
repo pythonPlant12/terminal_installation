@@ -33,6 +33,19 @@ git clone https://github.com/marlonrichert/zsh-autocomplete.git ~/zsh-autocomple
 source ~/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 ```
 
+## Post-Install: Catppuccin Mocha History Highlight
+
+The plugin hardcodes a bright yellow background for history search matches.
+A patch is included to replace it with Catppuccin Mocha Surface2 (`#585b70`) bg-only highlight.
+
+```bash
+cd ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete
+git apply ~/programming/personal/terminal_installation/zsh-autocomplete/catppuccin-history-highlight.patch
+```
+
+> **Note:** This patch modifies plugin source code. It will be overwritten if you
+> update the plugin via `git pull`. Re-apply the patch after each update.
+
 ## Configuration
 
 Add these configurations to your `~/.zshrc` after sourcing Oh My Zsh:
@@ -69,3 +82,4 @@ zstyle ':autocomplete:*' widget-style menu-select
 - If completions are slow, increase `min-delay`
 - If too many suggestions appear, decrease `max-lines`
 - Restart your shell after configuration changes
+- If history highlight reverts to yellow after plugin update, re-apply the Catppuccin patch
