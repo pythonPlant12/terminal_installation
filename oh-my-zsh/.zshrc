@@ -114,6 +114,8 @@ ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" 'ma=48;2;69;71;90'
 
+zle_highlight=('isearch:bg=#45475a' 'region:bg=#45475a' 'paste:none' 'suffix:fg=#6c7086')
+
 ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#f38ba8'
 ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=#cba6f7'
 ZSH_HIGHLIGHT_STYLES[alias]='fg=#a6e3a1'
