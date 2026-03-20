@@ -48,7 +48,7 @@ format = "[$symbol($version )]($style)"
 symbol = "󰌠 "
 pyenv_version_name = true
 style = "bold #f9e2af"
-format = "[$symbol$virtualenv$version]($style) "
+format = "[$symbol($virtualenv )$version]($style) "
 
 [golang]
 symbol = "🐹 "
