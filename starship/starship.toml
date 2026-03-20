@@ -16,13 +16,16 @@ disabled = true
 style = "bold #89b4fa"
 truncation_length = 3
 truncate_to_repo = false
+format = "[$path]($style)[$read_only]($read_only_style) "
 
 [git_branch]
 symbol = "󰘬 "
 style = "bold #cba6f7"
+format = "[|](bold #585b70) [$symbol$branch(:$remote_branch)]($style) "
 
 [git_status]
 style = "bold #f9e2af"
+format = '[$all_status$ahead_behind]($style)[|](bold #585b70) '
 conflicted = "[●](#f38ba8)"
 ahead = "[⇡](#a6e3a1)"
 behind = "[⇣](#fab387)"
@@ -77,7 +80,7 @@ format = "[$symbol$context]($style) "
 
 [kubernetes]
 symbol = "⎈ "
-format = 'on [$symbol$context( \($namespace\))](bold #89dceb) '
+format = '[$symbol$context( \($namespace\))](bold #89dceb) '
 style = "bold #89dceb"
 disabled = false
 detect_extensions = []
