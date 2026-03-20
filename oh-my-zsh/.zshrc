@@ -108,9 +108,33 @@ export VISUAL='nvim'
 eval "$(starship init zsh)"
 
 # Zsh-autosuggestions configuration
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#606060,bg=none,bold,underline"
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#6c7086,bg=none"
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" 'ma=48;2;69;71;90'
+
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#f38ba8'
+ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=#cba6f7'
+ZSH_HIGHLIGHT_STYLES[alias]='fg=#a6e3a1'
+ZSH_HIGHLIGHT_STYLES[suffix-alias]='fg=#a6e3a1'
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=#74c7ec'
+ZSH_HIGHLIGHT_STYLES[function]='fg=#89b4fa'
+ZSH_HIGHLIGHT_STYLES[command]='fg=#89b4fa'
+ZSH_HIGHLIGHT_STYLES[precommand]='fg=#a6e3a1,underline'
+ZSH_HIGHLIGHT_STYLES[commandseparator]='fg=#cba6f7'
+ZSH_HIGHLIGHT_STYLES[path]='fg=#f9e2af,underline'
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=#a6e3a1'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=#a6e3a1'
+ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]='fg=#a6e3a1'
+ZSH_HIGHLIGHT_STYLES[back-quoted-argument]='fg=#f5c2e7'
+ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]='fg=#cba6f7'
+ZSH_HIGHLIGHT_STYLES[redirection]='fg=#fab387'
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=#f5c2e7'
+ZSH_HIGHLIGHT_STYLES[history-expansion]='fg=#cba6f7'
+ZSH_HIGHLIGHT_STYLES[comment]='fg=#6c7086'
+ZSH_HIGHLIGHT_STYLES[arg0]='fg=#89b4fa'
+ZSH_HIGHLIGHT_STYLES[default]='fg=#cdd6f4'
 
 # Zsh-autocomplete configuration
 zstyle ':autocomplete:*' min-delay 0.1
