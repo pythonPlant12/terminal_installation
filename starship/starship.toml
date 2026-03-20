@@ -18,11 +18,21 @@ truncation_length = 3
 truncate_to_repo = false
 
 [git_branch]
-symbol = "🌱 "
+symbol = "󰘬 "
 style = "bold #cba6f7"
 
 [git_status]
 style = "bold #f9e2af"
+conflicted = "[●](#f38ba8)"
+ahead = "[⇡](#a6e3a1)"
+behind = "[⇣](#fab387)"
+diverged = "[⇕](#f9e2af)"
+untracked = "[●](#cba6f7)"
+stashed = "[●](#89dceb)"
+modified = "[●](#f9e2af)"
+staged = "[●](#a6e3a1)"
+renamed = "[●](#89b4fa)"
+deleted = "[●](#f38ba8)"
 
 [nodejs]
 symbol = "⬢ "
@@ -76,9 +86,7 @@ detect_folders = ['.kube']
 detect_env_vars = ['KUBECONFIG', 'KUBECTL_CONTEXT']
 
 [package]
-symbol = "📦 "
-style = "bold #fab387"
-format = "is [$symbol$version]($style) "
+disabled = true
 
 [time]
 disabled = false
