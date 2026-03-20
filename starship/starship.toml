@@ -1,103 +1,90 @@
-# Starship Configuration
-# Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Move time to the right side of terminal
 right_format = '$time'
 
-# Character
 [character]
-success_symbol = '[➜](bold green)'
-error_symbol = '[➜](bold red)'
+success_symbol = '[➜](bold #a6e3a1)'
+error_symbol = '[➜](bold #f38ba8)'
 
-# Disable AWS module to hide eu-west-3
 [aws]
 disabled = true
 
-# Disable GCloud module
 [gcloud]
 disabled = true
 
-# Directory
 [directory]
-style = "bold cyan"
+style = "bold #89b4fa"
 truncation_length = 3
 truncate_to_repo = false
 
-# Git Branch
 [git_branch]
 symbol = "🌱 "
-style = "bold purple"
+style = "bold #cba6f7"
 
-# Git Status
 [git_status]
-style = "bold yellow"
+style = "bold #f9e2af"
 
-# Programming Languages with versions
 [nodejs]
 symbol = "⬢ "
-style = "bold green"
+style = "bold #a6e3a1"
 format = "via [$symbol($version )]($style)"
 
 [rust]
 symbol = "🦀 "
-style = "bold red"
+style = "bold #fab387"
 format = "via [$symbol($version )]($style)"
 
 [python]
 symbol = "🐍 "
 pyenv_version_name = true
-style = "bold yellow"
+style = "bold #f9e2af"
 format = "via [$symbol $virtualenv $version]($style) "
 
 [golang]
 symbol = "🐹 "
-style = "bold cyan"
+style = "bold #89dceb"
 format = "via [$symbol($version )]($style)"
 
 [java]
 symbol = "☕ "
-style = "bold red"
+style = "bold #f38ba8"
 format = "via [$symbol($version )]($style)"
 
 [php]
 symbol = "🐘 "
-style = "bold purple"
+style = "bold #cba6f7"
 format = "via [$symbol($version )]($style)"
 
 [dart]
 symbol = "🎯 "
-style = "bold blue"
+style = "bold #89b4fa"
 format = "via [$symbol($version )]($style)"
 
 [docker_context]
 symbol = "🐳 "
-style = "bold blue"
+style = "bold #89b4fa"
 format = "via [$symbol$context]($style) "
 
 [kubernetes]
 symbol = "⎈ "
-format = 'on [$symbol$context( \($namespace\))](bold blue) '
-style = "bold blue"
+format = 'on [$symbol$context( \($namespace\))](bold #89dceb) '
+style = "bold #89dceb"
 disabled = false
 detect_extensions = []
 detect_files = ['k8s', 'kube']
 detect_folders = ['.kube']
 detect_env_vars = ['KUBECONFIG', 'KUBECTL_CONTEXT']
 
-# Package version
 [package]
 symbol = "📦 "
-style = "bold yellow"
+style = "bold #fab387"
 format = "is [$symbol$version]($style) "
 
-# Time (right-aligned)
 [time]
 disabled = false
 format = '🕙[$time]($style)'
 time_format = "%H:%M:%S"
-style = "bold white"
+style = "bold #bac2de"
 
-# Add line break for readability
 [line_break]
 disabled = false
