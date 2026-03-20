@@ -35,7 +35,7 @@ renamed = "[●](#89b4fa)"
 deleted = "[●](#f38ba8)"
 
 [nodejs]
-symbol = "⬢ "
+symbol = "󰎙 "
 style = "bold #a6e3a1"
 format = "via [$symbol($version )]($style)"
 
@@ -45,7 +45,7 @@ style = "bold #fab387"
 format = "via [$symbol($version )]($style)"
 
 [python]
-symbol = "🐍 "
+symbol = "󰌠 "
 pyenv_version_name = true
 style = "bold #f9e2af"
 format = "via [$symbol $virtualenv $version]($style) "
