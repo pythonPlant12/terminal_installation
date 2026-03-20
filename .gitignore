@@ -1,0 +1,20 @@
+# agent orchestration — durable plans tracked, ephemeral state ignored (added automatically)
+.sisyphus/*
+!.sisyphus/README.md
+!.sisyphus/plans/
+.sisyphus/plans/*
+!.sisyphus/plans/README.md
+
+# GSD planning — lifecycle docs tracked, execution state ignored (added automatically)
+.planning/STATE.md
+.planning/config.json
+.planning/debug/
+
+# task database (added automatically)
+.dolt
+.beads/**/**
+!.beads/issues.jsonl
+!.beads/interactions.jsonl
+
+# pipeline step execution state (machine-local, Practice 1; added automatically)
+.state/
