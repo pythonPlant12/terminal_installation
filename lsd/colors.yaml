@@ -10,9 +10,9 @@ permission:
   acl: "#7dbbb1"
   context: "#74b6c3"
 date:
-  hour-old: "#7dbbb1"
-  day-old: "#74b6c3"
-  older: "#63a5c3"
+  hour-old: "#585b70"
+  day-old: "#585b70"
+  older: "#585b70"
 size:
   none: "#8b90a6"
   small: "#8bbe87"
