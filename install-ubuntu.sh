@@ -262,6 +262,18 @@ copy_configurations() {
         print_info "Copying Tmux tab style configuration..."
         cp "tmux/.tmux-tab-style.conf" "$HOME/.tmux-tab-style.conf"
     fi
+
+    # Reload tmux if a session is running so config changes apply immediately
+    if tmux list-sessions &>/dev/null 2>&1; then
+        print_info "Reloading tmux configuration..."
+        tmux source-file ~/.tmux.conf
+        # Oh My Tmux's _apply_configuration runs in background and overwrites
+        # window-status formats; wait for it to finish before re-applying our
+        # custom tab style.
+        sleep 4
+        tmux source-file ~/.tmux-tab-style.conf
+        print_success "Tmux configuration reloaded"
+    fi
     
     print_success "Configurations copied (backups in $backup_dir)"
 }
