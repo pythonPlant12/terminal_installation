@@ -6,3 +6,5 @@ font-size = 15.5
 adjust-cell-height=-5%
 adjust-cell-width=-7%
 macos-non-native-fullscreen=false
+window-padding-balance = true
+window-padding-y = 0

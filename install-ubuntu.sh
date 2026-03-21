@@ -91,8 +91,8 @@ install_oh_my_zsh() {
     print_step "Installing Oh My Zsh..."
     
     if [[ -d "$HOME/.oh-my-zsh" ]]; then
-        print_warning "Oh My Zsh already installed. Backing up existing installation..."
-        mv "$HOME/.oh-my-zsh" "$HOME/.oh-my-zsh.backup.$(date +%Y%m%d_%H%M%S)"
+        print_success "Oh My Zsh already installed"
+        return
     fi
     
     # Install Oh My Zsh (non-interactive)
@@ -152,13 +152,12 @@ install_starship() {
     print_step "Installing Starship..."
     
     if command -v starship &> /dev/null; then
-        print_warning "Starship already installed. Updating..."
+        print_success "Starship already installed"
+        return
     fi
     
-    # Install Starship
     curl -sS https://starship.rs/install.sh | sh -s -- --yes
     
-    # Add to PATH if not already there
     if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
         echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
         export PATH="$HOME/.local/bin:$PATH"
@@ -171,7 +170,6 @@ install_starship() {
 install_tmux() {
     print_step "Installing Tmux and Oh My Tmux..."
     
-    # Install tmux via apt
     if ! command -v tmux &> /dev/null; then
         print_info "Installing tmux via apt..."
         sudo apt install -y tmux
@@ -180,16 +178,14 @@ install_tmux() {
         print_success "Tmux already installed"
     fi
     
-    # Install Oh My Tmux
     if [[ -d "$HOME/.tmux" ]]; then
-        print_warning "Oh My Tmux already installed. Backing up..."
-        mv "$HOME/.tmux" "$HOME/.tmux.backup.$(date +%Y%m%d_%H%M%S)"
+        print_success "Oh My Tmux already installed"
+    else
+        print_info "Installing Oh My Tmux..."
+        git clone https://github.com/gpakosz/.tmux.git "$HOME/.tmux"
+        ln -s -f "$HOME/.tmux/.tmux.conf" "$HOME/.tmux.conf"
+        print_success "Oh My Tmux installed"
     fi
-    
-    print_info "Installing Oh My Tmux..."
-    git clone https://github.com/gpakosz/.tmux.git "$HOME/.tmux"
-    ln -s -f "$HOME/.tmux/.tmux.conf" "$HOME/.tmux.conf"
-    print_success "Oh My Tmux installed"
 }
 
 install_nerd_fonts() {
