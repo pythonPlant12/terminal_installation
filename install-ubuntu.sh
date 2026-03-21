@@ -192,47 +192,38 @@ install_tmux() {
     print_success "Oh My Tmux installed"
 }
 
-# Install Nerd Font
-install_nerd_font() {
-    print_step "Installing Nerd Font (FiraCode)..."
+install_nerd_fonts() {
+    print_step "Installing Nerd Fonts (Victor Mono, JetBrains Mono, Iosevka)..."
     
-    # Create fonts directory
     mkdir -p ~/.local/share/fonts
     
-    # Check if FiraCode Nerd Font is already installed
-    if fc-list | grep -i "firacode.*nerd" &> /dev/null; then
-        print_warning "FiraCode Nerd Font already installed"
-        return
-    fi
+    local font_version="v3.3.0"
+    local fonts=("VictorMono" "JetBrainsMono" "Iosevka")
     
-    print_info "Downloading FiraCode Nerd Font..."
+    for font_name in "${fonts[@]}"; do
+        if fc-list | grep -i "${font_name}.*nerd" &> /dev/null; then
+            print_warning "$font_name Nerd Font already installed"
+            continue
+        fi
+        
+        print_info "Downloading $font_name Nerd Font..."
+        local font_url="https://github.com/ryanoasis/nerd-fonts/releases/download/${font_version}/${font_name}.zip"
+        local temp_dir=$(mktemp -d)
+        
+        if curl -L "$font_url" -o "$temp_dir/${font_name}.zip"; then
+            print_info "Extracting and installing $font_name..."
+            unzip -q "$temp_dir/${font_name}.zip" -d "$temp_dir"
+            find "$temp_dir" -name "*.ttf" -exec cp {} ~/.local/share/fonts/ \;
+            rm -rf "$temp_dir"
+            print_success "$font_name Nerd Font installed"
+        else
+            print_error "Failed to download $font_name Nerd Font"
+            rm -rf "$temp_dir"
+        fi
+    done
     
-    # Download FiraCode Nerd Font
-    font_version="v3.0.2"
-    font_url="https://github.com/ryanoasis/nerd-fonts/releases/download/${font_version}/FiraCode.zip"
-    temp_dir=$(mktemp -d)
-    
-    curl -L "$font_url" -o "$temp_dir/FiraCode.zip"
-    
-    if [[ -f "$temp_dir/FiraCode.zip" ]]; then
-        print_info "Extracting and installing font..."
-        unzip -q "$temp_dir/FiraCode.zip" -d "$temp_dir"
-        
-        # Copy TTF files to fonts directory
-        find "$temp_dir" -name "*.ttf" -exec cp {} ~/.local/share/fonts/ \;
-        
-        # Update font cache
-        fc-cache -fv ~/.local/share/fonts/
-        
-        # Cleanup
-        rm -rf "$temp_dir"
-        
-        print_success "FiraCode Nerd Font installed"
-        print_warning "Please configure your terminal to use 'FiraCode Nerd Font'"
-    else
-        print_error "Failed to download FiraCode Nerd Font"
-        print_info "You can manually download it from: https://github.com/ryanoasis/nerd-fonts"
-    fi
+    fc-cache -fv ~/.local/share/fonts/
+    print_warning "Please configure your terminal to use 'VictorMono Nerd Font'"
 }
 
 # Copy configurations
@@ -368,20 +359,25 @@ install_lazygit() {
 install_scooter() {
     print_step "Installing scooter..."
     
-    if command -v scooter &> /dev/null; then
+    if ! command -v scooter &> /dev/null; then
+        if ! command -v cargo &> /dev/null; then
+            print_error "Rust and Cargo are required but not installed."
+            print_info "Please install Rust first: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+            return 1
+        fi
+        
+        cargo install scooter
+        print_success "scooter installed"
+    else
         print_success "scooter already installed"
-        return
     fi
     
-    if ! command -v cargo &> /dev/null; then
-        print_error "Rust and Cargo are required but not installed."
-        print_info "Please install Rust first: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
-        return 1
+    # Deploy scooter config (editor_open for nvim integration)
+    if [[ -f "configs/scooter/config.toml" ]]; then
+        mkdir -p "$HOME/.config/scooter"
+        cp "configs/scooter/config.toml" "$HOME/.config/scooter/config.toml"
+        print_success "scooter config deployed"
     fi
-    
-    cargo install scooter
-    
-    print_success "scooter installed"
 }
 
 # Install Zed (code editor)
@@ -483,10 +479,10 @@ verify_installation() {
     fi
     
     # Check font installation
-    if fc-list | grep -i "firacode.*nerd" &> /dev/null; then
-        print_success "FiraCode Nerd Font: Installed"
+    if fc-list | grep -i "victormono.*nerd" &> /dev/null; then
+        print_success "VictorMono Nerd Font: Installed"
     else
-        print_warning "FiraCode Nerd Font: Not found (install manually if needed)"
+        print_warning "VictorMono Nerd Font: Not found (install manually if needed)"
     fi
     
     # Check lazygit
@@ -500,6 +496,12 @@ verify_installation() {
         print_success "scooter: Installed ($(scooter --version))"
     else
         print_warning "scooter: Not found (requires Rust/Cargo)"
+    fi
+
+    if [[ -f "$HOME/.config/scooter/config.toml" ]]; then
+        print_success "scooter config: Applied"
+    else
+        print_warning "scooter config: Not found"
     fi
 
     # Check Zed
@@ -529,7 +531,7 @@ main() {
     install_zsh_plugins
     install_starship
     install_tmux
-    install_nerd_font
+    install_nerd_fonts
     install_additional_packages
     install_lazygit
     install_scooter
@@ -543,7 +545,7 @@ main() {
     echo ""
     echo "Next steps:"
     echo "1. Restart your terminal or run: source ~/.zshrc"
-    echo "2. Configure your terminal to use 'FiraCode Nerd Font' for best experience"
+    echo "2. Configure your terminal to use 'VictorMono Nerd Font' for best experience"
     echo "3. Log out and log back in to apply the shell change"
     echo "4. Enjoy your enhanced terminal! 🚀"
     echo ""

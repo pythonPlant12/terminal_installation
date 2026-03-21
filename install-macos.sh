@@ -219,19 +219,26 @@ copy_configurations() {
     print_success "Configurations copied (backups in $backup_dir)"
 }
 
-# Install Nerd Font (optional)
-install_nerd_font() {
-    print_step "Installing Nerd Font (FiraCode)..."
+install_nerd_fonts() {
+    print_step "Installing Nerd Fonts..."
     
-    if brew list --cask font-fira-code-nerd-font &> /dev/null; then
-        print_warning "FiraCode Nerd Font already installed"
-    else
-        print_info "Installing FiraCode Nerd Font via Homebrew..."
-        brew tap homebrew/cask-fonts
-        brew install --cask font-fira-code-nerd-font
-        print_success "FiraCode Nerd Font installed"
-        print_warning "Please configure your terminal to use 'FiraCode Nerd Font'"
-    fi
+    local fonts=(
+        "font-victor-mono-nerd-font"
+        "font-jetbrains-mono-nerd-font"
+        "font-iosevka-nerd-font"
+    )
+    
+    for font in "${fonts[@]}"; do
+        if brew list --cask "$font" &> /dev/null; then
+            print_warning "$font already installed"
+        else
+            print_info "Installing $font via Homebrew..."
+            brew install --cask "$font"
+            print_success "$font installed"
+        fi
+    done
+    
+    print_warning "Please configure your terminal to use 'VictorMono Nerd Font'"
 }
 
 # Set Zsh as default shell
@@ -364,14 +371,19 @@ install_pycharm_config() {
 install_scooter() {
     print_step "Installing scooter..."
     
-    if command -v scooter &> /dev/null; then
+    if ! command -v scooter &> /dev/null; then
+        brew install scooter
+        print_success "scooter installed"
+    else
         print_success "scooter already installed"
-        return
     fi
     
-    brew install scooter
-    
-    print_success "scooter installed"
+    # Deploy scooter config (editor_open for nvim integration)
+    if [[ -f "configs/scooter/config.toml" ]]; then
+        mkdir -p "$HOME/.config/scooter"
+        cp "configs/scooter/config.toml" "$HOME/.config/scooter/config.toml"
+        print_success "scooter config deployed"
+    fi
 }
 
 # Final verification
@@ -478,6 +490,12 @@ verify_installation() {
     else
         print_warning "scooter: Not found"
     fi
+
+    if [[ -f "$HOME/.config/scooter/config.toml" ]]; then
+        print_success "scooter config: Applied"
+    else
+        print_warning "scooter config: Not found"
+    fi
 }
 
 # Main installation function
@@ -493,7 +511,7 @@ main() {
     install_starship
     install_tmux
     copy_configurations
-    install_nerd_font
+    install_nerd_fonts
     install_ghostty
     install_zed
     install_pycharm_config
@@ -506,7 +524,7 @@ main() {
     echo ""
     echo "Next steps:"
     echo "1. Restart your terminal or run: source ~/.zshrc"
-    echo "2. Configure your terminal to use 'FiraCode Nerd Font' for best experience"
+    echo "2. Configure your terminal to use 'VictorMono Nerd Font' for best experience"
     echo "3. Enjoy your enhanced terminal! 🚀"
     echo ""
     echo "Troubleshooting:"
