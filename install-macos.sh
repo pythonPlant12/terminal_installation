@@ -93,8 +93,8 @@ install_oh_my_zsh() {
     print_step "Installing Oh My Zsh..."
     
     if [[ -d "$HOME/.oh-my-zsh" ]]; then
-        print_warning "Oh My Zsh already installed. Backing up existing installation..."
-        mv "$HOME/.oh-my-zsh" "$HOME/.oh-my-zsh.backup.$(date +%Y%m%d_%H%M%S)"
+        print_success "Oh My Zsh already installed"
+        return
     fi
     
     # Install Oh My Zsh (non-interactive)
@@ -142,10 +142,10 @@ install_starship() {
     print_step "Installing Starship..."
     
     if command -v starship &> /dev/null; then
-        print_warning "Starship already installed. Updating..."
+        print_success "Starship already installed"
+        return
     fi
     
-    # Install Starship
     curl -sS https://starship.rs/install.sh | sh -s -- --yes
     print_success "Starship installed"
 }
@@ -154,7 +154,6 @@ install_starship() {
 install_tmux() {
     print_step "Installing Tmux and Oh My Tmux..."
     
-    # Install tmux via Homebrew
     if ! command -v tmux &> /dev/null; then
         print_info "Installing tmux via Homebrew..."
         brew install tmux
@@ -163,16 +162,14 @@ install_tmux() {
         print_success "Tmux already installed"
     fi
     
-    # Install Oh My Tmux
     if [[ -d "$HOME/.tmux" ]]; then
-        print_warning "Oh My Tmux already installed. Backing up..."
-        mv "$HOME/.tmux" "$HOME/.tmux.backup.$(date +%Y%m%d_%H%M%S)"
+        print_success "Oh My Tmux already installed"
+    else
+        print_info "Installing Oh My Tmux..."
+        git clone https://github.com/gpakosz/.tmux.git "$HOME/.tmux"
+        ln -s -f "$HOME/.tmux/.tmux.conf" "$HOME/.tmux.conf"
+        print_success "Oh My Tmux installed"
     fi
-    
-    print_info "Installing Oh My Tmux..."
-    git clone https://github.com/gpakosz/.tmux.git "$HOME/.tmux"
-    ln -s -f "$HOME/.tmux/.tmux.conf" "$HOME/.tmux.conf"
-    print_success "Oh My Tmux installed"
 }
 
 # Copy configurations
@@ -230,10 +227,14 @@ install_nerd_fonts() {
     
     for font in "${fonts[@]}"; do
         if brew list --cask "$font" &> /dev/null; then
-            print_warning "$font already installed"
+            print_success "$font already installed"
         else
             print_info "Installing $font via Homebrew..."
-            brew install --cask "$font"
+            # Use --adopt to handle fonts already installed manually (not tracked by Homebrew)
+            if ! brew install --cask "$font" 2>/dev/null; then
+                print_info "$font files already exist on disk, adopting into Homebrew..."
+                brew install --cask "$font" --adopt 2>/dev/null || print_warning "Could not install $font"
+            fi
             print_success "$font installed"
         fi
     done
