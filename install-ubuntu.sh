@@ -365,30 +365,23 @@ install_lazygit() {
     fi
 }
 
-# Install serpl (terminal search and replace tool)
-install_serpl() {
-    print_step "Installing serpl..."
+install_scooter() {
+    print_step "Installing scooter..."
     
-    if command -v serpl &> /dev/null; then
-        print_success "serpl already installed"
+    if command -v scooter &> /dev/null; then
+        print_success "scooter already installed"
         return
     fi
     
-    # Check if Rust/Cargo is installed
     if ! command -v cargo &> /dev/null; then
         print_error "Rust and Cargo are required but not installed."
         print_info "Please install Rust first: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
         return 1
     fi
     
-    print_info "Installing serpl with AST Grep support..."
-    cargo install serpl --features ast_grep
+    cargo install scooter
     
-    # Install ast-grep separately (required dependency)
-    print_info "Installing ast-grep..."
-    cargo install ast-grep
-    
-    print_success "serpl installed with AST Grep support"
+    print_success "scooter installed"
 }
 
 # Install Zed (code editor)
@@ -503,18 +496,10 @@ verify_installation() {
         print_warning "lazygit: Not found (install manually if needed)"
     fi
     
-    # Check serpl
-    if command -v serpl &> /dev/null; then
-        print_success "serpl: Installed ($(serpl --version))"
+    if command -v scooter &> /dev/null; then
+        print_success "scooter: Installed ($(scooter --version))"
     else
-        print_warning "serpl: Not found (requires Rust/Cargo)"
-    fi
-    
-    # Check ast-grep
-    if command -v ast-grep &> /dev/null; then
-        print_success "ast-grep: Installed ($(ast-grep --version | head -1))"
-    else
-        print_warning "ast-grep: Not found (part of serpl installation)"
+        print_warning "scooter: Not found (requires Rust/Cargo)"
     fi
 
     # Check Zed
@@ -547,7 +532,7 @@ main() {
     install_nerd_font
     install_additional_packages
     install_lazygit
-    install_serpl
+    install_scooter
     install_zed
     copy_configurations
     set_default_shell
@@ -571,7 +556,7 @@ main() {
     echo "Additional tools installed:"
     echo "- tree, htop, neofetch, ripgrep, fd-find, bat, exa (if available)"
     echo "- lazygit (Git TUI)"
-    echo "- serpl & ast-grep (terminal search & replace with AST support - requires Rust)"
+    echo "- scooter (terminal search & replace TUI - requires Rust)"
     echo ""
     echo "Optional tools:"
     echo "- Run ./install-k8s-docker-tools.sh for Kubernetes & Docker tools (k9s, kubectx, helm, etc.)"

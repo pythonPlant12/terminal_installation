@@ -361,31 +361,17 @@ install_pycharm_config() {
     print_success "PyCharm configuration installed"
 }
 
-# Install serpl (terminal search and replace tool)
-install_serpl() {
-    print_step "Installing serpl..."
+install_scooter() {
+    print_step "Installing scooter..."
     
-    if command -v serpl &> /dev/null; then
-        print_success "serpl already installed"
+    if command -v scooter &> /dev/null; then
+        print_success "scooter already installed"
         return
     fi
     
-    # Check if Rust/Cargo is installed
-    if ! command -v cargo &> /dev/null; then
-        print_error "Rust and Cargo are required but not installed."
-        print_info "Please install Rust first: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
-        print_info "Or install via Homebrew: brew install rust"
-        return 1
-    fi
+    brew install scooter
     
-    print_info "Installing serpl with AST Grep support..."
-    cargo install serpl --features ast_grep
-    
-    # Install ast-grep separately (required dependency)
-    print_info "Installing ast-grep..."
-    cargo install ast-grep
-    
-    print_success "serpl installed with AST Grep support"
+    print_success "scooter installed"
 }
 
 # Final verification
@@ -486,18 +472,11 @@ verify_installation() {
         print_error "Zed config: Not found"
     fi
 
-    # Check serpl
-    if command -v serpl &> /dev/null; then
-        print_success "serpl: Installed ($(serpl --version))"
+    # Check scooter
+    if command -v scooter &> /dev/null; then
+        print_success "scooter: Installed ($(scooter --version))"
     else
-        print_warning "serpl: Not found (requires Rust/Cargo)"
-    fi
-    
-    # Check ast-grep
-    if command -v ast-grep &> /dev/null; then
-        print_success "ast-grep: Installed ($(ast-grep --version | head -1))"
-    else
-        print_warning "ast-grep: Not found (part of serpl installation)"
+        print_warning "scooter: Not found"
     fi
 }
 
@@ -518,7 +497,7 @@ main() {
     install_ghostty
     install_zed
     install_pycharm_config
-    install_serpl
+    install_scooter
     set_default_shell
     verify_installation
     
@@ -536,7 +515,7 @@ main() {
     echo "- Check individual README files in each directory for detailed guides"
     echo ""
     echo "Additional tools installed:"
-    echo "- serpl & ast-grep (terminal search & replace with AST support - requires Rust)"
+    echo "- scooter (terminal search & replace TUI)"
     echo ""
     echo "Optional tools:"
     echo "- Run ./install-k8s-docker-tools.sh for Kubernetes & Docker tools (k9s, kubectx, helm, etc.)"
